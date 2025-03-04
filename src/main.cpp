@@ -1,10 +1,9 @@
 #include <SimpleFOC.h>
 //#include <pinout.h>
 
-// // NUMBER OF POLE PAIRS, NOT POLES
+// (Pole_pairs, resistance, kv, inductanse)
 BLDCMotor motor = BLDCMotor(14, 4.5, 70, 0.0018); 
-// // MUST USE 6PWM FOR B-G431 DRIVER
-// BLDCDriver6PWM driver = BLDCDriver6PWM(PHASE_UH, PHASE_UL, PHASE_VH, PHASE_VL, PHASE_WH, PHASE_WL); 
+
 BLDCDriver6PWM driver = BLDCDriver6PWM(PA8, PC13, PA9, PA12, PA10, PB15); 
 MagneticSensorI2C sensor = MagneticSensorI2C(AS5600_I2C);
 // LowsideCurrentSense current_sense = LowsideCurrentSense(0.003, 16.0, PA1, PA7, PB0);
@@ -39,6 +38,7 @@ motor.PID_velocity.D = 0.001;
   motor.init();
 sensor.init();
 motor.linkSensor(&sensor);
+//A - is the ID of driver
 commander.add('A', onMotor, "motor");
   // current_sense.init();
   // motor.linkCurrentSense(&current_sense);
@@ -52,13 +52,4 @@ void loop() {
   motor.move();
   motor.monitor();
   commander.run();
- // motor.move(float(analogRead(A_POTENTIOMETER) / 20) - 25);
-  // motor.move(100);
-  // Serial.print(analogRead(A_POTENTIOMETER));
-
-  // PhaseCurrent_s currents = current_sense.getPhaseCurrents();
-  // Serial.println(currents.a);
-
-  // Serial.print("  ");
-  // Serial.println(motor.shaft_velocity);
 }
