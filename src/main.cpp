@@ -226,16 +226,17 @@ void loop() {
       motor.PID_velocity.output_ramp = 1000;
 
       static float recievedSpeed = 0;
-      if(Serial.available()){
-        int newSpeed = Serial.parseInt();
-        if(newSpeed > -2500 && newSpeed < 2500)
-          recievedSpeed = newSpeed * 0.10466;
-        // float newSpeed = Serial.parseFloat();
-        // if(newSpeed < -2.0 && newSpeed > 2.0)
-        // {newSpeed = 2.0 * (newSpeed/abs(newSpeed));}
-        // recievedSpeed = newSpeed;
-        Serial.println(recievedSpeed);
-      }
+      recievedSpeed = -1000 * 0.10466;
+      // if(Serial.available()){
+      //   int newSpeed = Serial.parseInt();
+      //   if(newSpeed > -2500 && newSpeed < 2500)
+      //     recievedSpeed = newSpeed * 0.10466;
+      //   // float newSpeed = Serial.parseFloat();
+      //   // if(newSpeed < -2.0 && newSpeed > 2.0)
+      //   // {newSpeed = 2.0 * (newSpeed/abs(newSpeed));}
+      //   // recievedSpeed = newSpeed;
+      //   Serial.println(recievedSpeed);
+      // }
       // Serial.println(new_sensor.getFullRotations());
       motor.move(recievedSpeed);
       // motor.current_limit = max_current;
