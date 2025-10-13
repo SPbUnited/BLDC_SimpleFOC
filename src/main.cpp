@@ -24,7 +24,7 @@
 // 	hspi = new SPIClass(HSPI); // Original ESP32 has HSPI and VSPI available for use
 // 	hspi->begin(HSPI_SCK, HSPI_MISO, HSPI_MOSI); // Assign the pins 0.0021
 
-float max_current = 1.7;
+float max_current = 1.0;
 // (Pole_pairs, resistance, kv, inductanse)
 BLDCMotor motor = BLDCMotor(7, 3.6, 82.5, 0.0021); 
 uint32_t last_receive_timer = 0;
@@ -32,10 +32,10 @@ BLDCDriver6PWM driver = BLDCDriver6PWM(PA8, PC13, PA9, PA12, PA10, PB15);
 //MagneticSensorI2C sensor = MagneticSensorI2C(AS5600_I2C);
 // MagneticSensorAS5600 new_sensor;
 SPIClass SPI_3(PB5, A_CAN_SHDN, A_BUTTON);
-MagneticSensorAS5048A new_sensor = MagneticSensorAS5048A(pinNametoDigitalPin(PB_4));
+MagneticSensorAS5048A new_sensor = MagneticSensorAS5048A(pinNametoDigitalPin(PB_3));
 // MagneticSensorSPI new_sensor = MagneticSensorSPI(pinNametoDigitalPin(PB_4), 16, 0x3FFF);//MagneticSensorSPI(AS5048_SPI, pinNametoDigitalPin(PB_4));
 // MXLEMMINGObserverSensor new_sensor = MXLEMMINGObserverSensor(motor);
-LowsideCurrentSense current_sense = LowsideCurrentSense(0.003f, -64.0f/7.0f, A_OP1_OUT, A_OP2_OUT, A_OP3_OUT);
+LowsideCurrentSense current_sense = LowsideCurrentSense(0.003f, -9.0f, A_OP1_OUT, A_OP2_OUT, A_OP3_OUT);
 // Commander commander = Commander(Serial, 'e', false);
 double sen_angle = 0;
 int8_t sen_dir = 0;
@@ -115,8 +115,8 @@ void setup() {
   // motor.useMonitoring(Serial);
   // driver config
   // power supply voltage [V]
-  driver.voltage_power_supply = 16.0;
-  driver.voltage_limit = 4;
+  driver.voltage_power_supply = 24.0;
+  driver.voltage_limit = 16;
   driver.pwm_frequency = 20000;
   driver.init();
 
@@ -133,79 +133,45 @@ void setup() {
   motor.monitor_downsample = 300;
  // motor.LPF_current_d.Tf = 0.01;
   //motor.LPF_current_q.Tf = 0.01;
-  motor.voltage_limit = 4;   // [V]
+  // motor.voltage_limit = 4;   // [V]
   motor.current_limit = max_current;
   motor.velocity_limit = 10000; // [rad/s]
   // default P=0.5 I = 10 D = 0
-motor.PID_velocity.P = 0.7;
-motor.PID_velocity.I = 7;
-motor.PID_velocity.D = 0.0035; //0.0035
+motor.PID_velocity.P = 5;
+motor.PID_velocity.I = 2;
+motor.PID_velocity.D = 0.35; //0.0035
 
 
-motor.PID_current_d.P = 2.75;
-motor.PID_current_d.I = 350;
+motor.PID_current_d.P = 3;
+motor.PID_current_d.I = 250;
 motor.PID_current_d.D = 0;
 motor.LPF_current_d = 0.002f;
 
-motor.PID_current_q.P = 2.75;
-motor.PID_current_q.I = 350;
+motor.PID_current_q.P = 3;
+motor.PID_current_q.I = 250;
 motor.PID_current_q.D = 0;
 motor.LPF_current_q = 0.002f;
 
   // open loop control config
   motor.controller = MotionControlType::velocity;
-  motor.LPF_velocity = 0.05;
-  motor.PID_velocity.output_ramp = 1000;
-  motor.motion_downsample = 3;
+  motor.LPF_velocity = 0.4;
+  // motor.PID_velocity.output_ramp = 1000;
+  // motor.motion_downsample = 3;
   // init motor hardware
 motor.linkSensor(&new_sensor);
 //A - is the ID of drive
 // commander.add('Z', START_STOP, "motor");
 motor.linkCurrentSense(&current_sense);
-motor.sensor_direction= Direction::UNKNOWN;
-motor.zero_electric_angle = 0;
+motor.sensor_direction= Direction::CW;
+
 motor.init();
 current_sense.init();
-
+// motor.zero_electric_angle = 0;
 
 
 use = false;
 test = true;
 uint8_t motor_num = 1, robot = 1;
-// if(!test)
-// {
-//   if(robot == 1)
-//   {
-//     switch (motor_num)
-//     {
-//       case 1:
-//       motor.sensor_direction = Direction::CCW;
-//     motor.zero_electric_angle = 2.44;
-//     commander.add('A', onMotor, "motor");
-//     break;
-//       case 2:
-//       motor.sensor_direction = Direction::CW;
-//     motor.zero_electric_angle = 2.14;    
-//     commander.add('B', onMotor, "motor");
-//     break;
-
-//     case 3:
-//     motor.sensor_direction = Direction::CW;
-//     motor.zero_electric_angle = 1.36;
-//     commander.add('C', onMotor, "motor");
-//       break;
-//     case 4:
-//     motor.sensor_direction = Direction::CW;
-//     motor.zero_electric_angle = 0.52;
-//     commander.add('D', onMotor, "motor");
-//       break;
-//     }
-//   }
-// }
-// else
-// {
-//   delay(7000);
-// }
 motor.initFOC();
 pinMode(pinNametoDigitalPin(PC_6), OUTPUT);
 // digitalPin
@@ -214,108 +180,30 @@ digitalWrite(pinNametoDigitalPin(PC_6), HIGH);
 
 
 uint32_t timer1 = 0, timer2 = 0;
-
+bool flag = true;
 void loop() {
   motor.loopFOC();
-  //motor.move(10);
-  //timer2 += 1;
-  // if(timer2 == 100)
-  // {
-  //   timer2 = 0;
-  //   Serial.println(new_sensor.getAngle());
-  // }
-   if(!motor_disabled)
-   {
-   //motor.loopFOC();
-
-    if(use == true)
-    {
-      if(millis() - last_receive_timer < 100)
-      {
-        motor.current_limit = max_current;
-        motor.PID_velocity.P = 0.75;
-        motor.PID_velocity.I = 0.001;
-        motor.PID_velocity.D = 0.0035; 
-        motor.velocity_limit = 10000;
-        motor.PID_velocity.output_ramp = 1000;
-        motor.move();
-      }
-      else
-      {
-      // motor.LPF_velocity = 0.06;
-        motor.PID_velocity.P = 0.05;
-        motor.PID_velocity.I = 0.0025;
-        motor.PID_velocity.D = 0.0;
-        motor.current_limit = 0.01;
-        motor.velocity_limit = 0.05;
-        motor.move(0);
-      }
-    }
-   if(use == false)
-   {
-    // if(millis() - last_receive_timer < 10000)
-    // {
       motor.current_limit = max_current;
-      motor.PID_velocity.P = 1;
-      motor.PID_velocity.I = 1;
+      // motor.PID_velocity.P = 1;
+      // motor.PID_velocity.I = 10;
       // motor.PID_velocity.D = 0; 
       motor.velocity_limit = 10000;
-      motor.PID_velocity.output_ramp = 1000;
-
-      static float recievedSpeed = 0;
-      // if(Serial.available()){
-      //   int newSpeed = Serial.parseInt();
-      //   if(newSpeed > -2500 && newSpeed < 2500)
-      //     recievedSpeed = newSpeed * 0.10466;
-      // }
-      // float kek = new_sensor.getCurrentAngle();
-      // float lol = kek * 1;
-      motor.move(100);
-      // motor.monitor();
-      // pinMode(pinNametoDigitalPin(PC_6), OUTPUT);
-// digitalPin
-    // digitalWrite(pinNametoDigitalPin(PC_6), HIGH);
-    // // digitalPin
-    // delay(500);
-    // digitalWrite(pinNametoDigitalPin(PC_6), LOW);
-    // delay(500);
-      // motor.current_limit = max_current;
-      // motor.PID_velocity.P = 0.75;
-      // motor.PID_velocity.I = 0.1;
-      // motor.PID_velocity.D = 0.0035; 
-      // motor.velocity_limit = 10000;
       // motor.PID_velocity.output_ramp = 1000;
-      //  motor.move(2);
-    /*}
-    else if(millis() - last_receive_timer < 20000)
-    {
-      motor.move(-1*0.10466);
-    }
-      else if(millis() - last_receive_timer < 1000)
-    {
-    // motor.LPF_velocity = 0.06;
-      motor.PID_velocity.P = 0.1;
-      motor.PID_velocity.I = 0.005;
-      motor.PID_velocity.D = 0.0;
-      motor.current_limit = 0.01;
-      motor.velocity_limit = 0.05;
-      motor.move(0);
-    }
-    else if(millis() - last_receive_timer < 1000)
-    {
-
-      motor.PID_velocity.P = 0.1;
-      motor.PID_velocity.I = 0.005;
-      motor.PID_velocity.D = 0.0; 
-      motor.velocity_limit = 0.05;
-      motor.PID_velocity.output_ramp = 1000;
-      motor.move(0);
+      // motor.move(10);
+      // static float recievedSpeed = 0;
+      // // motor.move(3.14);
+      if(millis() - timer1 >= 5000)
+      {
+        flag = !flag;
+        timer1 = millis();
+      }
+      if (flag)
+      {
+          motor.move(-50);
       }
       else
-        last_receive_timer = millis();
-        */
-    
-   }
-  }
-  // commander.run();
+      {
+        motor.move(5);
+      }
+      // motor.monitor();
 }
