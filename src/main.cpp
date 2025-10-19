@@ -4,13 +4,14 @@
 #include "encoders/MXLEMMING_observer/MXLEMMINGObserverSensor.h"
 // #include "MagneticSensorAS5600.h"
 //#include <pinout.h>
-float max_current = 2.0;
+float max_current = 1.0;
 // (Pole_pairs, resistance, kv, inductanse)
 BLDCMotor motor = BLDCMotor(1, 0.955, 1050, 0.0498 * 0.001); 
 uint32_t last_receive_timer = 0;
-BLDCDriver6PWM driver = BLDCDriver6PWM(PA8, PC13, PA9, PA12, PA10, PB15); 
+BLDCDriver6PWM driver = BLDCDriver6PWM(PA8, PC13, PA10, PB15, PA9, PA12); 
 //MagneticSensorI2C sensor = MagneticSensorI2C(AS5600_I2C);
-// MagneticSensorAS5600 new_sensor;
+// MagneticSensorAS5600 new_sensor;1 2 3 3 1 2 2 3 1
+    //                             3 2 1 1 3 2 2 1 3
 HallSensor new_sensor(PB6,PB7,PB8,1);
 // MXLEMMINGObserverSensor new_sensor = MXLEMMINGObserverSensor(motor);
 LowsideCurrentSense current_sense = LowsideCurrentSense(0.003f, -9.0f, A_OP1_OUT, A_OP2_OUT, A_OP3_OUT);
@@ -84,7 +85,8 @@ void setup() {
   // driver config
   // power supply voltage [V]
   driver.voltage_power_supply = 24.0;
-  driver.pwm_frequency = 10000;
+  driver.voltage_limit = 12.0;
+  driver.pwm_frequency = 14000;
   driver.init();
 
   // link the motor and the driver
@@ -93,20 +95,20 @@ void setup() {
   current_sense.linkDriver(&driver);
   motor.sensor_direction = Direction::CW;
   // limiting motor movements
-  motor.foc_modulation = FOCModulationType::SinePWM;
+  motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
   motor.torque_controller = TorqueControlType::foc_current;
  motor.monitor_variables = _MON_TARGET|_MON_ANGLE|_MON_VEL;
   // motor.monitor_variables = _MON_CURR_Q;
   motor.monitor_downsample = 300;
  // motor.LPF_current_d.Tf = 0.01;
   //motor.LPF_current_q.Tf = 0.01;
-  motor.voltage_limit = 12;   // [V]
+  // motor.voltage_limit = 12;   // [V]
   motor.current_limit = max_current;
   motor.velocity_limit = 10000; // [rad/s]
   // default P=0.5 I = 10 D = 0
-motor.PID_velocity.P = 0.7;
-motor.PID_velocity.I = 0.1;
-motor.PID_velocity.D = 0.001;//0.0035; //0.0035
+motor.PID_velocity.P = 1;
+motor.PID_velocity.I = 0;
+motor.PID_velocity.D = 0;//0.001;//0.0035; //0.0035
 
 
 motor.PID_current_d.P = 1;//2.75;
@@ -190,7 +192,7 @@ void loop() {
   // if(timer2 == 100)
   // {
   //   timer2 = 0;
-    Serial.println("goida");
+    // Serial.println("goida");
   // }
    if(!motor_disabled)
    {
@@ -213,7 +215,7 @@ void loop() {
       //   Serial.println(recievedSpeed);
       // }
       // Serial.println
-      tmp_rot = new_sensor.getFullRotations();
+      // tmp_rot = new_sensor.getFullRotations();
       // if (millis() - timer1 > 5000)
       // {
       //   i += 1;
