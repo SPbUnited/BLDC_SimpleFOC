@@ -4,11 +4,11 @@
 #include "encoders/MXLEMMING_observer/MXLEMMINGObserverSensor.h"
 // #include "MagneticSensorAS5600.h"
 //#include <pinout.h>
-float max_current = 1.0;
+float max_current = 2.0;
 // (Pole_pairs, resistance, kv, inductanse)
 BLDCMotor motor = BLDCMotor(1, 0.955, 1050, 0.0498 * 0.001); 
 uint32_t last_receive_timer = 0;
-BLDCDriver6PWM driver = BLDCDriver6PWM(PA8, PC13, PA10, PB15, PA9, PA12); 
+BLDCDriver6PWM driver = BLDCDriver6PWM(PA8, PC13, PA9, PA12, PA10, PB15); 
 //MagneticSensorI2C sensor = MagneticSensorI2C(AS5600_I2C);
 // MagneticSensorAS5600 new_sensor;1 2 3 3 1 2 2 3 1
     //                             3 2 1 1 3 2 2 1 3
@@ -106,23 +106,23 @@ void setup() {
   motor.current_limit = max_current;
   motor.velocity_limit = 10000; // [rad/s]
   // default P=0.5 I = 10 D = 0
-motor.PID_velocity.P = 1;
+motor.PID_velocity.P = 1.5;
 motor.PID_velocity.I = 0;
 motor.PID_velocity.D = 0;//0.001;//0.0035; //0.0035
 
 
-motor.PID_current_d.P = 1;//2.75;
-motor.PID_current_d.I = 0;
+motor.PID_current_d.P = 0.7;//2.75;
+motor.PID_current_d.I = 1;
 motor.PID_current_d.D = 0;
 motor.LPF_current_d = 0.002f;
 
-motor.PID_current_q.P = 1;//2.75;
-motor.PID_current_q.I = 0;
+motor.PID_current_q.P = 0.7;//2.75;
+motor.PID_current_q.I = 15;
 motor.PID_current_q.D = 0;
 motor.LPF_current_q = 0.002f;
 
   // open loop control config
-  motor.controller = MotionControlType::velocity;
+  motor.controller = MotionControlType::torque;
   motor.LPF_velocity = 0.5;
   // motor.PID_velocity.output_ramp = 1000;
   motor.motion_downsample = 3;
@@ -225,12 +225,12 @@ void loop() {
       //   }
       //   timer1 = millis();
       // }
-      static float recievedSpeed = -2000 * 0.10466;
+      static float recievedSpeed = -1500 * 0.10466;
       // recievedSpeed = 
       // float tmp_f = recievedSpeed * float(i);
       // if (tmp_f < -200) tmp_f = -200;
       // if (tmp_f > 200) tmp_f = 200;
-      motor.move(recievedSpeed);
+      motor.move(-0.85);
       // motor.current_limit = max_current;
       // motor.PID_velocity.P = 0.75;
       // motor.PID_velocity.I = 0.1;
