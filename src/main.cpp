@@ -32,7 +32,7 @@ BLDCDriver6PWM driver = BLDCDriver6PWM(PA8, PC13, PA9, PA12, PA10, PB15);
 //MagneticSensorI2C sensor = MagneticSensorI2C(AS5600_I2C);
 // MagneticSensorAS5600 new_sensor;
 SPIClass SPI_3(PB5, A_CAN_SHDN, A_BUTTON);
-MagneticSensorAS5048A new_sensor = MagneticSensorAS5048A(pinNametoDigitalPin(PB_3));
+MagneticSensorAS5048A new_sensor = MagneticSensorAS5048A(pinNametoDigitalPin(PA_15));
 // MagneticSensorSPI new_sensor = MagneticSensorSPI(pinNametoDigitalPin(PB_4), 16, 0x3FFF);//MagneticSensorSPI(AS5048_SPI, pinNametoDigitalPin(PB_4));
 // MXLEMMINGObserverSensor new_sensor = MXLEMMINGObserverSensor(motor);
 LowsideCurrentSense current_sense = LowsideCurrentSense(0.003f, -9.0f, A_OP1_OUT, A_OP2_OUT, A_OP3_OUT);
@@ -116,7 +116,7 @@ void setup() {
   // driver config
   // power supply voltage [V]
   driver.voltage_power_supply = 24.0;
-  driver.voltage_limit = 16;
+  driver.voltage_limit = 4;
   driver.pwm_frequency = 20000;
   driver.init();
 
@@ -154,7 +154,7 @@ motor.LPF_current_q = 0.002f;
 
   // open loop control config
   motor.controller = MotionControlType::velocity;
-  motor.LPF_velocity = 0.4;
+  motor.LPF_velocity = 0.3;
   // motor.PID_velocity.output_ramp = 1000;
   // motor.motion_downsample = 3;
   // init motor hardware
@@ -162,7 +162,7 @@ motor.linkSensor(&new_sensor);
 //A - is the ID of drive
 // commander.add('Z', START_STOP, "motor");
 motor.linkCurrentSense(&current_sense);
-motor.sensor_direction= Direction::CW;
+motor.sensor_direction= Direction::UNKNOWN;
 
 motor.init();
 current_sense.init();
@@ -199,11 +199,11 @@ void loop() {
       }
       if (flag)
       {
-          motor.move(-50);
+          motor.move(-80);
       }
       else
       {
-        motor.move(5);
+        motor.move(7);
       }
       // motor.monitor();
 }
