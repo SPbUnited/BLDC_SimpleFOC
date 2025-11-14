@@ -28,7 +28,19 @@ jobs:
         run: pip install platformio
 
       - name: Build firmware
-        run: pio run -e disco_b_g431b_esc1
+        run: pio run -e disco_b_g431b_esc1 --silent
+
+      - name: Install ARM toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi
+
+      - name: Generate HEX from ELF
+        run: |
+          arm-none-eabi-objcopy \
+            -O ihex \
+            .pio/build/disco_b_g431b_esc1/firmware.elf \
+            .pio/build/disco_b_g431b_esc1/firmware.hex
 
       - name: Upload CI artifact
         uses: actions/upload-artifact@v4
@@ -41,9 +53,7 @@ jobs:
         run: |
           set -e
 
-          # Имя ветки (без refs/heads/)
           BRANCH="${GITHUB_REF_NAME}"
-          # Заменим / на - чтобы тег был валидный
           SAFE_BRANCH="${BRANCH//\//-}"
           PREFIX="${SAFE_BRANCH}-v0.0."
 
@@ -53,7 +63,6 @@ jobs:
 
           git fetch --tags
 
-          # Находим последний тег для этой ветки, вида BRANCH-v0.0.X
           LAST_TAG=$(git tag --list "${PREFIX}*" | sort -V | tail -n1 || true)
           echo "Last tag: $LAST_TAG"
 
@@ -67,9 +76,7 @@ jobs:
           NEW_TAG="${PREFIX}${NEXT_FIX}"
           echo "New tag: $NEW_TAG"
 
-          # Собираем коммиты после прошлого тега
           if [ -z "$LAST_TAG" ]; then
-            # Если тегов ещё не было — берём всю историю
             git log --pretty=format:'- %s' --no-merges > release_notes.md
           else
             git log --pretty=format:'- %s' --no-merges "${LAST_TAG}..HEAD" > release_notes.md
