@@ -1,0 +1,106 @@
+name: Build & Release firmware
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build firmware
+        run: pio run -e disco_b_g431b_esc1 --silent
+
+      - name: Install ARM toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi
+
+      - name: Generate HEX from ELF
+        run: |
+          arm-none-eabi-objcopy \
+            -O ihex \
+            .pio/build/disco_b_g431b_esc1/firmware.elf \
+            .pio/build/disco_b_g431b_esc1/firmware.hex
+
+      - name: Upload CI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ github.ref_name }}
+          path: .pio/build/disco_b_g431b_esc1/firmware.*
+
+      - name: Compute next tag and release notes
+        id: version
+        run: |
+          set -e
+
+          BRANCH="${GITHUB_REF_NAME}"
+          SAFE_BRANCH="${BRANCH//\//-}"
+          PREFIX="${SAFE_BRANCH}-v0.0."
+
+          echo "Branch: $BRANCH"
+          echo "Safe branch: $SAFE_BRANCH"
+          echo "Prefix: $PREFIX"
+
+          git fetch --tags
+
+          LAST_TAG=$(git tag --list "${PREFIX}*" | sort -V | tail -n1 || true)
+          echo "Last tag: $LAST_TAG"
+
+          if [ -z "$LAST_TAG" ]; then
+            LAST_FIX=-1
+          else
+            LAST_FIX=${LAST_TAG##${PREFIX}}
+          fi
+
+          NEXT_FIX=$((LAST_FIX + 1))
+          NEW_TAG="${PREFIX}${NEXT_FIX}"
+          echo "New tag: $NEW_TAG"
+
+          if [ -z "$LAST_TAG" ]; then
+            git log --pretty=format:'- %s' --no-merges > release_notes.md
+          else
+            git log --pretty=format:'- %s' --no-merges "${LAST_TAG}..HEAD" > release_notes.md
+          fi
+
+          echo "tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+          echo "last_tag=$LAST_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          body_path: release_notes.md
+          files: |
+            .pio/build/disco_b_g431b_esc1/firmware.bin
+            .pio/build/disco_b_g431b_esc1/firmware.elf
+            .pio/build/disco_b_g431b_esc1/firmware.hex
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
