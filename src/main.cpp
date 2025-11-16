@@ -3,13 +3,16 @@
 #include <SPI.h>
 
 #define SPI_SR_TXP
+
+// #include "./STM32_CAN/STM32_CAN.h"
 // #include "AS5600.h"
 // #include "encoders/as5048a/AS5048A.h"
 #include "encoders/as5048a/MagneticSensorAS5048A.h"
 // #include "encoders/MXLEMMING_observer/MXLEMMINGObserverSensor.h"
 //#include <pinout.h>
-
+// STM32_CAN Can1( PA11, PB9 );
 // SPIClass *hspi = NULL;
+// static CAN_message_t CAN_RX_msg;
 
 // SPI Clock Speed - AS5048A support 10 MHz maximum
 // static const uint32_t AS5048A_spiClk = 1000000UL;  // ?1 MHz
@@ -94,7 +97,7 @@ bool motor_disabled = false;
 //   }
 // }
 
-bool test = true, use = true;
+bool test_motor = true, use = true;
 
 void setup() {
   // Wire.setClock(1000000);
@@ -102,6 +105,10 @@ void setup() {
   // new_sensor.closeTransactions = true;
   // new_sensor.useHysteresis = false;
   // SPIClass mS = SPIClass(pinNametoDigitalPin(PB_5), pinNametoDigitalPin(PC_11), pinNametoDigitalPin(PC_10), pinNametoDigitalPin(PB_4));
+  // Can1.begin();
+  // Can1.setFrameFormat(STM32_CAN::FRAME_FORMAT::CLASSIC);
+  // Can1.setBaudRate(250000, 250000);
+
 
   // new_sensor.init(&mS);
   // mS.begin();
@@ -170,7 +177,7 @@ current_sense.init();
 
 
 use = false;
-test = true;
+test_motor = true;
 uint8_t motor_num = 1, robot = 1;
 motor.initFOC();
 pinMode(pinNametoDigitalPin(PC_6), OUTPUT);
@@ -199,11 +206,46 @@ void loop() {
       }
       if (flag)
       {
-          motor.move(-80);
+          motor.move(-7);
       }
       else
       {
         motor.move(7);
       }
       // motor.monitor();
+
+    //   if (Can1.read(CAN_RX_msg) ) {
+    //     Serial.print("Channel:");
+    //     Serial.print(CAN_RX_msg.bus);
+    //     if (CAN_RX_msg.flags.extended == false) {
+    //       Serial.print(" Standard ID:");
+    //     }
+    //     else {
+    //       Serial.print(" Extended ID:");
+    //     }
+    //     Serial.print(CAN_RX_msg.id, HEX);
+
+    // #if defined(HAL_FDCAN_MODULE_ENABLED)
+    //     if(CAN_RX_msg.flags.fd_rateswitch) {
+    //       Serial.println(" [FD-BRS]");
+    //     }
+    //     else if(CAN_RX_msg.flags.fd_frame) {
+    //       Serial.println(" [FD]");
+    //     }
+    // #endif
+
+    //     Serial.print(" DLC: ");
+    //     Serial.print(CAN_RX_msg.len);
+    //     if (CAN_RX_msg.flags.remote == false) {
+    //       Serial.print(" buf: ");
+    //       for(int i=0; i<CAN_RX_msg.len; i++) {
+    //         Serial.print("0x"); 
+    //         Serial.print(CAN_RX_msg.buf[i], HEX); 
+    //         if (i != (CAN_RX_msg.len-1))  Serial.print(" ");
+    //       }
+    //       Serial.println();
+    //     } else {
+    //       Serial.println(" Data: REMOTE REQUEST FRAME");
+    //     }
+    // }
 }
