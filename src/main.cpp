@@ -143,12 +143,12 @@ motor.PID_velocity.D = 0.35; //0.0035
 
 
 motor.PID_current_d.P = 3;
-motor.PID_current_d.I = 250;
+motor.PID_current_d.I = 1;
 motor.PID_current_d.D = 0;
 motor.LPF_current_d = 0.002f;
 
 motor.PID_current_q.P = 3;
-motor.PID_current_q.I = 250;
+motor.PID_current_q.I = 1;
 motor.PID_current_q.D = 0;
 motor.LPF_current_q = 0.002f;
 
@@ -173,9 +173,14 @@ use = false;
 test = true;
 uint8_t motor_num = 1, robot = 1;
 motor.initFOC();
+pinMode(pinNametoDigitalPin(PB_11), OUTPUT);
+pinMode(pinNametoDigitalPin(PB_13), OUTPUT);
 pinMode(pinNametoDigitalPin(PC_6), OUTPUT);
 // digitalPin
+digitalWrite(pinNametoDigitalPin(PB_11), LOW);
+digitalWrite(pinNametoDigitalPin(PB_13), LOW);
 digitalWrite(pinNametoDigitalPin(PC_6), HIGH);
+
 }
 
 
