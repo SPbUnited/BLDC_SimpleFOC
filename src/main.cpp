@@ -116,7 +116,7 @@ void setup() {
   // driver config
   // power supply voltage [V]
   driver.voltage_power_supply = 24.0;
-  driver.voltage_limit = 4;
+  driver.voltage_limit = 10;
   driver.pwm_frequency = 20000;
   driver.init();
 
@@ -204,11 +204,11 @@ void loop() {
       }
       if (flag)
       {
-          motor.move(-80);
+          motor.move(-40);
       }
       else
       {
-        motor.move(7);
+        motor.move(40);
       }
       // motor.monitor();
 }
