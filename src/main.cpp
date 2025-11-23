@@ -3,7 +3,7 @@
 #include <SPI.h>
 #include <SimpleCan.h>
 #define SPI_SR_TXP
-
+#include "../include/CAN_Fuoco.h"
 // #include "./STM32_CAN/STM32_CAN.h"
 // #include "AS5600.h"
 // #include "encoders/as5048a/AS5048A.h"
@@ -53,6 +53,12 @@ bool motor_disabled = false;
 // void onMotor(char* cmd){ 
 //   float new_speed = 0;
 //   commander.scalar(&new_speed, cmd);
+CANFuocoMotorConfig motor_config = {
+    .motor_id = 1,
+    .get_supply_voltage = get_supply_voltage,
+    .motor = motor,
+};
+CANFuoco can_fuoco(motor_config);
 //   motor.target = float(new_speed);
 //   last_receive_timer = millis();
 // }
