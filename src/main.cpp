@@ -53,12 +53,12 @@ bool motor_disabled = false;
 // void onMotor(char* cmd){ 
 //   float new_speed = 0;
 //   commander.scalar(&new_speed, cmd);
-CANFuocoMotorConfig motor_config = {
-    .motor_id = 1,
-    .get_supply_voltage = get_supply_voltage,
-    .motor = motor,
-};
-CANFuoco can_fuoco(motor_config);
+// CANFuocoMotorConfig motor_config = {
+//     .motor_id = 1,
+//     .get_supply_voltage = get_supply_voltage,
+//     .motor = motor,
+// };
+// CANFuoco can_fuoco(motor_config);
 //   motor.target = float(new_speed);
 //   last_receive_timer = millis();
 // }
@@ -195,10 +195,14 @@ test_motor = true;
 uint8_t motor_num = 1, robot = 1;
 motor.initFOC();
 pinMode(pinNametoDigitalPin(PC_6), OUTPUT);
+pinMode(pinNametoDigitalPin(PB_13), OUTPUT);
+pinMode(pinNametoDigitalPin(PB_11), OUTPUT);
 // pinMode(PB14, INPUT_ANALOG);
 // pinMode(PA4, INPUT_ANALOG);
 // digitalPin
-digitalWrite(pinNametoDigitalPin(PC_6), LOW);
+digitalWrite(pinNametoDigitalPin(PC_6), HIGH);
+digitalWrite(pinNametoDigitalPin(PB_13), HIGH);
+digitalWrite(pinNametoDigitalPin(PB_11), HIGH);
 init_CAN();
 }
 
@@ -230,22 +234,50 @@ static void init_CAN()
 	// 	? "CAN: started."
 	// 	: "CAN: error when starting.");
 }
-
+uint32_t color = 0;
 static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
 {
 	// if ((rxHeader.Identifier != 0x321) || (rxHeader.IdType != FDCAN_STANDARD_ID) || (rxHeader.DataLength != FDCAN_DLC_BYTES_2))
-	// {
-	// 	return;
-	// }
-
-	digitalToggle(LED_BUILTIN);
+  if(rxHeader.Identifier == 0x040)
+	{
+    // if (color <= 1)
+    // {
+    //     digitalWrite(PB13, LOW);
+    //     digitalWrite(PC6, HIGH);
+    //     digitalWrite(PB11, HIGH);
+    // }
+    // else if (color <= 3)
+    // {
+    //   digitalWrite(PB13, HIGH);
+    //   digitalWrite(PC6, LOW);
+    //   digitalWrite(PB11, HIGH);
+    // }
+    // else
+    // {
+    //   digitalWrite(PB13, HIGH);
+    //   digitalWrite(PC6, HIGH);
+    //   digitalWrite(PB11, LOW);
+    // }
+    // color += 1;
+    // if (color >= 6)
+    // {
+    //   color = 0;
+    // }
+    digitalToggle(LED_BUILTIN);    
+    color += 1;
+    
+    // delay(100);
+	}
+  
+	// return
 }
 
 uint32_t timer1 = 0, timer2 = 0;
 int8_t flag = 0;
+uint32_t save_com = 0;
 double b14=0, a0=0, a4=0;
 void loop() {
-  motor.loopFOC();
+  // motor.loopFOC();
   // b14 = analogRead(PB14);
   b14 = _readADCVoltageLowSide(A_VBUS, current_sense.params) * 9.2;
   double analog = _readADCVoltageLowSide(A_TEMPERATURE, current_sense.params);
@@ -291,7 +323,12 @@ void loop() {
       motor.move(-50);
     }
     // motor.monitor();
-
+    if (millis() - timer2 >= 1000)
+    {
+      save_com = color;
+      color = 0;
+      timer2 = millis();
+    }
   //   if (Can1.read(CAN_RX_msg) ) {
   //     // Serial.print("Channel:");
   //     // Serial.print(CAN_RX_msg.bus);
