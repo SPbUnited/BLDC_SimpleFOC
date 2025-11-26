@@ -50,18 +50,18 @@ int8_t sen_dir = 0;
 bool motor_callibrated = false;
 bool motor_disabled = false;
 
+float get_vbus(void)
+{
+  return _readADCVoltageLowSide(A_VBUS, current_sense.params) * 9.2;
+}
+
 // void onMotor(char* cmd){ 
 //   float new_speed = 0;
 //   commander.scalar(&new_speed, cmd);
-// CANFuocoMotorConfig motor_config = {
-//     .motor_id = 1,
-//     .get_supply_voltage = get_supply_voltage,
-//     .motor = motor,
-// };
-// CANFuoco can_fuoco(motor_config);
-//   motor.target = float(new_speed);
-//   last_receive_timer = millis();
-// }
+
+  // motor.target = float(new_speed);
+  // last_receive_timer = millis();
+
 
 // void START_STOP(char* cmd){ 
 //   float _start_stop_data = 0;
@@ -107,9 +107,14 @@ bool motor_disabled = false;
 //       motor_disabled = false;
 //   }
 // }
+CANFuocoMotorConfig motor_config = {.motor_id = 4,
+    // .get_supply_voltage = get_vbus,
+    .motor = motor,
+};
+
 
 bool test_motor = true, use = true;
-
+uint8_t motor_id = 0;
 void setup() {
   // Wire.setClock(1000000);
   // Serial.begin(115200);
@@ -133,7 +138,7 @@ void setup() {
   // power supply voltage [V]
   driver.voltage_power_supply = 24.0;
   driver.voltage_limit = 4;
-  driver.pwm_frequency = 14000;
+  driver.pwm_frequency = 20000;
   driver.init();
 
   // Can1.begin();
@@ -163,12 +168,12 @@ motor.PID_velocity.D = 0.35; //0.0035
 
 
 motor.PID_current_d.P = 3;
-motor.PID_current_d.I = 350;
+motor.PID_current_d.I = 3;
 motor.PID_current_d.D = 0;
 motor.LPF_current_d = 0.002f;
 
 motor.PID_current_q.P = 3;
-motor.PID_current_q.I = 350;
+motor.PID_current_q.I = 3;
 motor.PID_current_q.D = 0;
 motor.LPF_current_q = 0.002f;
 
@@ -176,7 +181,7 @@ motor.LPF_current_q = 0.002f;
   motor.controller = MotionControlType::velocity;
   motor.LPF_velocity = 0.3;
   // motor.PID_velocity.output_ramp = 1000;
-  // motor.motion_downsample = 3;
+  // motor.motion_downsample = 0;
 
   // init motor hardware
 motor.linkSensor(&new_sensor);
@@ -199,12 +204,28 @@ pinMode(pinNametoDigitalPin(PB_13), OUTPUT);
 pinMode(pinNametoDigitalPin(PB_11), OUTPUT);
 // pinMode(PB14, INPUT_ANALOG);
 // pinMode(PA4, INPUT_ANALOG);
+pinMode(PC14, INPUT_PULLUP);
+pinMode(PC15, INPUT_PULLUP);
+pinMode(PB3, INPUT_PULLUP);
+uint8_t A0 = (~digitalRead(PC14) & 0x01)<< 1;
+uint8_t A1 = (~digitalRead(PC15) & 0x01) << 0;
+uint8_t A2 = (~digitalRead(PB3) & 0x01) << 2;
+motor_id = A0 + A1 + A2;
+
+uint8_t lol_id =  motor_id & 0xFF;
 // digitalPin
 digitalWrite(pinNametoDigitalPin(PC_6), HIGH);
 digitalWrite(pinNametoDigitalPin(PB_13), HIGH);
 digitalWrite(pinNametoDigitalPin(PB_11), HIGH);
+// delay()
+
+motor_config.motor_id = motor_id;
+motor.target = 0;
 init_CAN();
 }
+
+
+CANFuoco can_fuoco(motor_config);
 
 static void init_CAN()
 {
@@ -235,38 +256,30 @@ static void init_CAN()
 	// 	: "CAN: error when starting.");
 }
 uint32_t color = 0;
+bool start = false;
 static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
 {
 	// if ((rxHeader.Identifier != 0x321) || (rxHeader.IdType != FDCAN_STANDARD_ID) || (rxHeader.DataLength != FDCAN_DLC_BYTES_2))
   if(rxHeader.Identifier == 0x040)
 	{
-    // if (color <= 1)
-    // {
-    //     digitalWrite(PB13, LOW);
-    //     digitalWrite(PC6, HIGH);
-    //     digitalWrite(PB11, HIGH);
-    // }
-    // else if (color <= 3)
-    // {
-    //   digitalWrite(PB13, HIGH);
-    //   digitalWrite(PC6, LOW);
-    //   digitalWrite(PB11, HIGH);
-    // }
-    // else
-    // {
-    //   digitalWrite(PB13, HIGH);
-    //   digitalWrite(PC6, HIGH);
-    //   digitalWrite(PB11, LOW);
-    // }
-    // color += 1;
-    // if (color >= 6)
-    // {
-    //   color = 0;
-    // }
     digitalToggle(LED_BUILTIN);    
     color += 1;
+    // rxData[2] = 0;
+    // rxData[3] = 0x3C;
     
-    // delay(100);
+    // uint8_t arr[8] = { 0, 0x3C, 0, 0x3C, 1, 1, 1, 1};
+    // if (color<=300)
+    // {
+    //   arr[3] = 0xCD;
+    // }
+    // else if (color > 600)
+    //   color = 0;
+    // uint8_t* lolarr =  arr;
+    can_fuoco.can_rx_callback(CANFuocoRegisterMap::MULTI_TARGET_W, 8, rxData);
+    // motor.move(can_fuoco.speed);
+    // if (!start){
+    //   start = true;
+    // }
 	}
   
 	// return
@@ -275,25 +288,29 @@ static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
 uint32_t timer1 = 0, timer2 = 0;
 int8_t flag = 0;
 uint32_t save_com = 0;
+float test_float = 0;
 double b14=0, a0=0, a4=0;
+
 void loop() {
+  motor.loopFOC();
+      // motor.move(can_fuoco.speed);
   // motor.loopFOC();
   // b14 = analogRead(PB14);
-  b14 = _readADCVoltageLowSide(A_VBUS, current_sense.params) * 9.2;
-  double analog = _readADCVoltageLowSide(A_TEMPERATURE, current_sense.params);
-  analog = ((float)((1 << 12) - 1) / ((4096.0f/3.3f)*analog) - 1.0f) / 2.12;
-  analog = (log(analog) / 3900.0f) + 1.0f / (25.0f + 273.15f);
-  a0 = 1.0f / analog - 273.15f;
-  analog = _readADCVoltageLowSide(PA4, current_sense.params);
-  analog = ((float)((1 << 12) - 1) / ((4096.0f/3.3f)*analog) - 1.0f) / 2.12;
-  analog = (log(analog) / 3900.0f) + 1.0f / (25.0f + 273.15f);
-  a4 = 1.0f / analog - 273.15f;
-  // analog =  4700 * (4096 / ((4096/3.3) * analog) - 1.0);
-  // // analog = 0.47 / ((float)((1 << 12) - 1) / analog - 1.0f);
-  // analog = 1.0f/(298.15) + (1.0f/3380) * (log(analog/10000));// + 1.0f / (25 + 273.15f);
+  // b14 = _readADCVoltageLowSide(A_VBUS, current_sense.params) * 9.2;
+  // double analog = _readADCVoltageLowSide(A_TEMPERATURE, current_sense.params);
+  // analog = ((float)((1 << 12) - 1) / ((4096.0f/3.3f)*analog) - 1.0f) / 2.12;
+  // analog = (log(analog) / 3900.0f) + 1.0f / (25.0f + 273.15f);
   // a0 = 1.0f / analog - 273.15f;
-  // a0 = (1.0f / analog - 273.15f);
-  uint32_t tmp_an = a0 + b14 + a4;
+  // analog = _readADCVoltageLowSide(PA4, current_sense.params);
+  // analog = ((float)((1 << 12) - 1) / ((4096.0f/3.3f)*analog) - 1.0f) / 2.12;
+  // analog = (log(analog) / 3900.0f) + 1.0f / (25.0f + 273.15f);
+  // a4 = 1.0f / analog - 273.15f;
+  // // analog =  4700 * (4096 / ((4096/3.3) * analog) - 1.0);
+  // // // analog = 0.47 / ((float)((1 << 12) - 1) / analog - 1.0f);
+  // // analog = 1.0f/(298.15) + (1.0f/3380) * (log(analog/10000));// + 1.0f / (25 + 273.15f);
+  // // a0 = 1.0f / analog - 273.15f;
+  // // a0 = (1.0f / analog - 273.15f);
+  // uint32_t tmp_an = a0 + b14 + a4;
   //   motor.current_limit = max_current;
   //   // motor.PID_velocity.P = 1;
   //   // motor.PID_velocity.I = 10;
@@ -303,32 +320,43 @@ void loop() {
   //   // motor.move(10);
   //   // static float recievedSpeed = 0;
   //   // // motor.move(3.14);
-    if(millis() - timer1 >= 3000)
-    {
-      flag += 1;
-      if (flag >= 3)
-        flag = 0;
-      timer1 = millis();
-    }
-    if (flag == 0)
-    {
-        motor.move(50);
-    }
-    else if (flag == 1)
-    {
-      motor.move(0);
-    }
-    else
-    {
-      motor.move(-50);
-    }
-    // motor.monitor();
-    if (millis() - timer2 >= 1000)
-    {
-      save_com = color;
-      color = 0;
-      timer2 = millis();
-    }
+    // if(millis() - timer1 >= 3000)
+    // {
+    //   flag += 1;
+    //   if (flag >= 3)
+    //     flag = 0;
+    //   timer1 = millis();
+    // }
+    // if (flag == 0)
+    // {
+    //     motor.move(50);
+    // }
+    // else if (flag == 1)
+    // {
+    //   motor.move(0);
+    // }
+    // uint8_t arr[8] = { 0, 0x3C, 0, 0x3C, 1, 1, 1, 1};
+    // uint8_t* lolarr =  arr;
+    // ushort *target_data = reinterpret_cast<ushort *>(lolarr);
+    // test_float = half_to_float(target_data[motor_id - 1]);
+
+    digitalToggle(PB11);    
+    // int* ptr = arr;
+    // can_fuoco.can_rx_callback(CANFuocoRegisterMap::MULTI_TARGET_W, 8, )
+    // else
+    // {
+      motor.move();
+    // }
+    // // motor.monitor();
+    // if (millis() - timer2 >= 1000)
+    // {
+    //   save_com = color;
+    //   color = 0;
+    //   timer2 = millis();
+    // }
+    // uint8_t arr[8] = { 0, 0x3C, 0, 0x3C, 1, 1, 1, 1};
+    // uint8_t* lolarr =  arr;
+    // can_fuoco.can_rx_callback(CANFuocoRegisterMap::MULTI_TARGET_W, 8, lolarr);
   //   if (Can1.read(CAN_RX_msg) ) {
   //     // Serial.print("Channel:");
   //     // Serial.print(CAN_RX_msg.bus);
@@ -363,4 +391,5 @@ void loop() {
   //       // Serial.println(" Data: REMOTE REQUEST FRAME");
   //     }
   // }
+  // delay(1);
 }

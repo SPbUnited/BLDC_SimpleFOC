@@ -114,6 +114,7 @@ struct CANFuocoMotorConfig
     int motor_id;
     float get_supply_voltage(void);
     BLDCMotor &motor;
+    float speed = 0;
 };
 
 struct CANFuocoMonitorSettings
@@ -248,7 +249,9 @@ void CANFuoco::can_rx_callback(CANFuocoRegisterMap id, size_t len, uint8_t *buf)
         if (1 <= motor_id && motor_id < 5)
         {
             ushort *target_data = reinterpret_cast<ushort *>(buf);
-            motor.move(half_to_float(target_data[motor_id - 1]));
+            speed = half_to_float(target_data[motor_id - 1]);
+            motor.target = speed;
+            // motor.move(half_to_float(target_data[motor_id - 1]));
         }
         break;
 
@@ -273,7 +276,7 @@ bool CANFuoco::can_tx_callback(uint8_t *buf)
     {
     case SUPPLY_VOLTAGE_R:
     {
-        float supply_voltage = get_supply_voltage();
+        float supply_voltage = 13; //get_supply_voltage();
         memcpy(buf, &supply_voltage, len);
         break;
     }
