@@ -16,6 +16,8 @@ static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData);
 static void init_CAN(void);
 SimpleCan can1(/*terminateTransceiver:*/true);
 SimpleCan::RxHandler can1RxHandler(8, handleCanMessage);
+FDCAN_TxHeaderTypeDef TxHeader;
+uint8_t TxData[8];
 // SPIClass *hspi = NULL;
 // static CAN_message_t CAN_RX_msg;
 
@@ -260,8 +262,8 @@ bool start = false;
 static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
 {
 	// if ((rxHeader.Identifier != 0x321) || (rxHeader.IdType != FDCAN_STANDARD_ID) || (rxHeader.DataLength != FDCAN_DLC_BYTES_2))
-  if(rxHeader.Identifier == 0x040)
-	{
+  // if(rxHeader.Identifier == 0x040)
+	// {
     digitalToggle(LED_BUILTIN);    
     color += 1;
     // rxData[2] = 0;
@@ -275,14 +277,40 @@ static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
     // else if (color > 600)
     //   color = 0;
     // uint8_t* lolarr =  arr;
-    can_fuoco.can_rx_callback(CANFuocoRegisterMap::MULTI_TARGET_W, 8, rxData);
+    can_fuoco.can_rx_callback(static_cast<CANFuocoRegisterMap>(rxHeader.Identifier), 8, rxData);
     // motor.move(can_fuoco.speed);
     // if (!start){
     //   start = true;
     // }
-	}
+	// }
   
 	// return
+}
+
+void send_message()
+{
+  TxHeader.Identifier = 0x321;
+	TxHeader.IdType = FDCAN_STANDARD_ID;
+	TxHeader.TxFrameType = FDCAN_DATA_FRAME;
+	TxHeader.DataLength = FDCAN_DLC_BYTES_8;
+	TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+	TxHeader.BitRateSwitch = FDCAN_BRS_OFF;
+	TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
+	TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+	TxHeader.MessageMarker = 0;
+
+	TxData[0] = 0x13;
+	TxData[1] = 0xAD;
+
+	can1.addMessageToTxFifoQ(&TxHeader, TxData);
+}
+
+double check_motor_temp()
+{
+  double analog = _readADCVoltageLowSide(PA4, current_sense.params);
+  analog = ((float)((1 << 12) - 1) / ((4096.0f/3.3f)*analog) - 1.0f) / 2.12;
+  analog = (log(analog) / 3900.0f) + 1.0f / (25.0f + 273.15f);
+  return 1.0f / analog - 273.15f;
 }
 
 uint32_t timer1 = 0, timer2 = 0;
@@ -292,7 +320,10 @@ float test_float = 0;
 double b14=0, a0=0, a4=0;
 
 void loop() {
-  motor.loopFOC();
+  if (check_motor_temp() < 60)
+  {
+    motor.loopFOC();
+  }
       // motor.move(can_fuoco.speed);
   // motor.loopFOC();
   // b14 = analogRead(PB14);
@@ -301,10 +332,7 @@ void loop() {
   // analog = ((float)((1 << 12) - 1) / ((4096.0f/3.3f)*analog) - 1.0f) / 2.12;
   // analog = (log(analog) / 3900.0f) + 1.0f / (25.0f + 273.15f);
   // a0 = 1.0f / analog - 273.15f;
-  // analog = _readADCVoltageLowSide(PA4, current_sense.params);
-  // analog = ((float)((1 << 12) - 1) / ((4096.0f/3.3f)*analog) - 1.0f) / 2.12;
-  // analog = (log(analog) / 3900.0f) + 1.0f / (25.0f + 273.15f);
-  // a4 = 1.0f / analog - 273.15f;
+  
   // // analog =  4700 * (4096 / ((4096/3.3) * analog) - 1.0);
   // // // analog = 0.47 / ((float)((1 << 12) - 1) / analog - 1.0f);
   // // analog = 1.0f/(298.15) + (1.0f/3380) * (log(analog/10000));// + 1.0f / (25 + 273.15f);
