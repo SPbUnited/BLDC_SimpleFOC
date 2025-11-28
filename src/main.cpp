@@ -33,7 +33,7 @@ bool motor_callibrated = false;
 bool motor_disabled = false;
 
     
-CANFuocoMotorConfig motor_config = {.motor_id = 4,
+CANFuocoMotorConfig motor_config = {.motor_id = 3,
     // .get_supply_voltage = get_vbus,
     .motor = motor,
 };
@@ -109,7 +109,7 @@ motor_id = A0 + A1 + A2;
 
 uint8_t lol_id =  motor_id & 0xFF;
 digitalWrite(pinNametoDigitalPin(PC_6), HIGH);
-digitalWrite(pinNametoDigitalPin(PB_13), HIGH);
+digitalWrite(pinNametoDigitalPin(PB_13), LOW);
 digitalWrite(pinNametoDigitalPin(PB_11), HIGH);
 
 motor_config.motor_id = motor_id;
@@ -189,17 +189,17 @@ float get_pcm_temp()
 }
 
 
-uint32_t timer2 = 0;
-int package_recived_per_second()
-{
-  if (millis() - timer2 >= 1000)
-    {
-      save_com = color;
-      color = 0;
-      timer2 = millis();
-    }
-    return save_com;
-}
+// uint32_t timer2 = 0;
+// int package_recived_per_second()
+// {
+//   if (millis() - timer2 >= 1000)
+//     {
+//       save_com = color;
+//       color = 0;
+//       timer2 = millis();
+//     }
+//     return save_com;
+// }
 
 uint32_t timer1 = 0;
 int8_t flag = 0;
@@ -227,10 +227,10 @@ float test_float = 0;
 double b14=0, a0=0, a4=0;
 
 void loop() {
-  if (get_motor_temp() < 60)
-  {
+  // if (get_motor_temp() < 60)
+  // {
     motor.loopFOC();
-  }
+  // }
   // motor.loopFOC();
   //   // motor.PID_velocity.output_ramp = 1000;
     
@@ -239,7 +239,7 @@ void loop() {
     // ushort *target_data = reinterpret_cast<ushort *>(lolarr);
     // test_float = half_to_float(target_data[motor_id - 1]);
 
-    digitalToggle(PB11);   
+    // digitalToggle(PB11);   
     motor.move();
     
 }
