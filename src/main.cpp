@@ -33,7 +33,7 @@ bool motor_callibrated = false;
 bool motor_disabled = false;
 
     
-CANFuocoMotorConfig motor_config = {.motor_id = 4,
+CANFuocoMotorConfig motor_config = {.motor_id = 3,
     // .get_supply_voltage = get_vbus,
     .motor = motor,
 };
@@ -144,7 +144,7 @@ uint32_t color = 0;
 bool start = false;
 static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
 {
-    digitalToggle(LED_BUILTIN);    
+    digitalToggle(PB13);    
     color += 1;
     can_fuoco.can_rx_callback(static_cast<CANFuocoRegisterMap>(rxHeader.Identifier), 8, rxData);
 }
@@ -189,17 +189,17 @@ float get_pcm_temp()
 }
 
 
-uint32_t timer2 = 0;
-int package_recived_per_second()
-{
-  if (millis() - timer2 >= 1000)
-    {
-      save_com = color;
-      color = 0;
-      timer2 = millis();
-    }
-    return save_com;
-}
+// uint32_t timer2 = 0;
+// int package_recived_per_second()
+// {
+//   if (millis() - timer2 >= 1000)
+//     {
+//       save_com = color;
+//       color = 0;
+//       timer2 = millis();
+//     }
+//     return save_com;
+// }
 
 uint32_t timer1 = 0;
 int8_t flag = 0;
@@ -227,9 +227,20 @@ float test_float = 0;
 double b14=0, a0=0, a4=0;
 
 void loop() {
-  if (get_motor_temp() < 60)
+  if (get_motor_temp() < 45.0)
   {
     motor.loopFOC();
+    digitalWrite(PC6, HIGH);   
+    digitalWrite(PB11, LOW);  
+    motor.move();
+  }
+  else
+  {
+    motor.target = 0;
+    motor.move();
+    digitalWrite(PC6, LOW);   
+    digitalWrite(PB11, HIGH);   
+    motor.disable();
   }
   // motor.loopFOC();
   //   // motor.PID_velocity.output_ramp = 1000;
@@ -237,9 +248,5 @@ void loop() {
     // uint8_t arr[8] = { 0, 0x3C, 0, 0x3C, 1, 1, 1, 1};
     // uint8_t* lolarr =  arr;
     // ushort *target_data = reinterpret_cast<ushort *>(lolarr);
-    // test_float = half_to_float(target_data[motor_id - 1]);
-
-    digitalToggle(PB11);   
-    motor.move();
-    
+    // test_float = half_to_float(target_data[motor_id - 1]);   
 }
