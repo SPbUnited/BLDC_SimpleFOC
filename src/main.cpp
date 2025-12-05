@@ -33,7 +33,7 @@ bool motor_callibrated = false;
 bool motor_disabled = false;
 
     
-CANFuocoMotorConfig motor_config = {.motor_id = 3,
+CANFuocoMotorConfig motor_config = {.motor_id = 2,
     // .get_supply_voltage = get_vbus,
     .motor = motor,
 };
@@ -50,7 +50,7 @@ void setup() {
   // new_sensor.init();
   // power supply voltage [V]
   driver.voltage_power_supply = 24.0;
-  driver.voltage_limit = 4;
+  driver.voltage_limit = 8;
   driver.pwm_frequency = 20000;
   driver.init();
   new_sensor.init(&SPI_3);
@@ -144,9 +144,15 @@ uint32_t color = 0;
 bool start = false;
 static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
 {
-    digitalToggle(LED_BUILTIN);    
+  
+  if (rxHeader.Identifier == 0x40)
+  {
+    // digitalToggle(PB13);    
     color += 1;
-    can_fuoco.can_rx_callback(static_cast<CANFuocoRegisterMap>(rxHeader.Identifier), 8, rxData);
+    if (color % 100 == 0)
+      digitalToggle(PB13);    
+    can_fuoco.can_rx_callback(rxHeader.Identifier, 8, rxData);
+  }
 }
 
 void send_message()
@@ -225,11 +231,30 @@ void test_motor_tuda_syda(float speed_forward, float speed_backward, uint32_t ti
 uint32_t save_com = 0;
 float test_float = 0;
 double b14=0, a0=0, a4=0;
-
+bool error = false;
 void loop() {
-  // if (get_motor_temp() < 60)
-  // {
+  if (get_motor_temp() < 50.0)
+  {
     motor.loopFOC();
+    motor.move();
+  }
+  else
+  {
+    error = true;
+    motor.target = 0;
+    motor.move();  
+    motor.disable();
+  }
+  // if (error)
+  // {
+  //   digitalWrite(PC6, HIGH);   
+  //   digitalWrite(PB11, LOW);   
+  // }
+  // else
+  // {
+  //   digitalWrite(PC6, LOW);   
+  //   // digitalWrite(PB13, LOW);
+  //   digitalWrite(PB11, HIGH);   
   // }
   // motor.loopFOC();
   //   // motor.PID_velocity.output_ramp = 1000;

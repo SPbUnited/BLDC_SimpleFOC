@@ -132,7 +132,7 @@ private:
 public:
     CANFuoco(CANFuocoMotorConfig &motor_config);
 
-    void can_rx_callback(CANFuocoRegisterMap id, size_t len, uint8_t *buf);
+    void can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf);
     bool can_tx_callback(uint8_t *buf);
 };
 
@@ -193,8 +193,9 @@ CANFuoco::CANFuoco(
     };
 }
 
-void CANFuoco::can_rx_callback(CANFuocoRegisterMap id, size_t len, uint8_t *buf)
+void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
 {
+    CANFuocoRegisterMap id = static_cast<CANFuocoRegisterMap>(m_id);
     switch (id)
     {
     default:
