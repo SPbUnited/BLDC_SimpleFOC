@@ -206,6 +206,17 @@ float get_pcm_temp()
 //     }
 //     return save_com;
 // }
+// uint32_t timer2 = 0;
+// int package_recived_per_second()
+// {
+//   if (millis() - timer2 >= 1000)
+//     {
+//       save_com = color;
+//       color = 0;
+//       timer2 = millis();
+//     }
+//     return save_com;
+// }
 
 uint32_t timer1 = 0;
 int8_t flag = 0;
@@ -262,9 +273,5 @@ void loop() {
     // uint8_t arr[8] = { 0, 0x3C, 0, 0x3C, 1, 1, 1, 1};
     // uint8_t* lolarr =  arr;
     // ushort *target_data = reinterpret_cast<ushort *>(lolarr);
-    // test_float = half_to_float(target_data[motor_id - 1]);
-
-    // digitalToggle(PB11);   
-    motor.move();
-    
+    // test_float = half_to_float(target_data[motor_id - 1]);   
 }
