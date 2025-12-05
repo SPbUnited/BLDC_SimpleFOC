@@ -1,0 +1,101 @@
+0,EMERGENCY_STOP [w],Аварийный останов. При записи любого значения драйвер полностью обесточивает электропривод на 15 секунд
+1,SUPPLY_VOLTAGE [r],Напряжение питания
+4,MONITOR_SETTINGS [rw],"Настройка мониторинга. Значение регистра указывает на то, какой регистр будет отправлятся в обратной связи от драйвера"
+-,-,-
+,===== SimpleFOC =====,
+,=== State variables ===,
+10,TARGET [rw] [FLOAT32],"Текущая уставка. Смысл зависит от выбранного режима управления"
+11,FEED_FORWARD_VELOCITY [r] [FLOAT32],"Current feed forward velocity"
+12,SHAFT_ANGLE [r] [FLOAT32],"Current motor angle"
+13,ELECTRICAL_ANGLE [r] [FLOAT32],"Current electrical angle"
+14,SHAFT_VELOCITY [r] [FLOAT32],"Current motor velocity"
+15,CURRENT_SP [r] [FLOAT32],"Target current ( q current )"
+16,SHAFT_VELOCITY_SP [r] [FLOAT32],"Current target velocity"
+17,SHAFT_ANGLE_SP [r] [FLOAT32],"Current target angle"
+18,VOLTAGE_D [r] [FLOAT32],"Current d voltage set to the motor"
+19,VOLTAGE_Q [r] [FLOAT32],"Current q voltage set to the motor"
+20,CURRENT_D [r] [FLOAT32],"Current d current measured"
+21,CURRENT_Q [r] [FLOAT32],"Current q current measured"
+22,VOLTAGE_BEMF [r] [FLOAT32],"Estimated backemf voltage (if provided KV constant)"
+23,U_ALPHA [r] [FLOAT32],"Phase voltages U alpha and U beta used for inverse Park and Clarke transform"
+24,U_BETA [r] [FLOAT32],"-//-"
+,=== Motor configuration parameters ===,
+25,VOLTAGE_SENSOR_ALIGN [rw] [FLOAT32],sensor and motor align voltage parameter
+26,VELOCITY_INDEX_SEARCH [rw] [FLOAT32],target velocity for index search
+,=== Motor physical parameters ===,
+27,PHASE_RESISTANCE [rw] [FLOAT32],"Motor phase resistance"
+28,POLE_PAIRS [rw] [INT32],"Motor pole pairs number"
+29,KV_RATING [rw] [FLOAT32],"Motor KV rating"
+30,PHASE_INDUCTANCE [rw] [FLOAT32],"Motor phase inductance"
+,=== Limiting variables ===,
+31,VOLTAGE_LIMIT [rw] [FLOAT32],"Voltage limiting variable"
+32,CURRENT_LIMIT [rw] [FLOAT32],"Current limiting variable"
+33,VELOCITY_LIMIT [rw] [FLOAT32],"Velocity limiting variable"
+,=== Motor status ===,
+34,ENABLED [rw] [BOOL],"enabled or disabled motor flag"
+35,MOTOR_STATUS [r] [FOCMotorStatus],"Motor status
+enum FOCMotorStatus : uint8_t {
+  motor_uninitialized = 0x00,     //!< Motor is not yet initialized
+  motor_initializing  = 0x01,     //!< Motor intiialization is in progress
+  motor_uncalibrated  = 0x02,     //!< Motor is initialized, but not calibrated (open loop possible)
+  motor_calibrating   = 0x03,     //!< Motor calibration in progress
+  motor_ready         = 0x04,     //!< Motor is initialized and calibrated (closed loop possible)
+  motor_error         = 0x08,     //!< Motor is in error state (recoverable, e.g. overcurrent protection active)
+  motor_calib_failed  = 0x0E,     //!< Motor calibration failed (possibly recoverable)
+  motor_init_failed   = 0x0F,     //!< Motor initialization failed (not recoverable)
+};"
+,=== PWM modulation settings,
+36,FOC_MODULATION [rw] [FOCModulationType],"Parameter determining modulation algorithm:
+  SinePWM            = 0x00,     //!< Sinusoidal PWM modulation
+  SpaceVectorPWM     = 0x01,     //!< Space vector modulation method
+  Trapezoid_120      = 0x02,     
+  Trapezoid_150      = 0x03,     "
+37,MODULATION_CENTERED [rw] [BOOL],Flag (1) centered modulation around driver limit /2  or  (0) pulled to 0
+,=== Control mode ===,
+38,TORQUE_CONTROLLER [rw] [TorqueControlType],"enum TorqueControlType : uint8_t { 
+  voltage            = 0x00,     //!< Torque control using voltage
+  dc_current         = 0x01,     //!< Torque control using DC current (one current magnitude)
+  foc_current        = 0x02,     //!< torque control using dq currents
+};"
+39,CONTROLLER [rw] [MotionControlType],"Режим управления мотором. При изменении обнуляет уставку
+enum MotionControlType : uint8_t {
+  torque            = 0x00,     //!< Torque control
+  velocity          = 0x01,     //!< Velocity motion control
+  angle             = 0x02,     //!< Position/angle motion control
+  velocity_openloop = 0x03,
+  angle_openloop    = 0x04
+};"
+-,-,-
+,=== Controller and low pass filter settings ===,
+40,PID_CURRENT_D_P [rw],
+41,PID_CURRENT_D_I [rw],
+42,PID_CURRENT_D_D [rw],
+43,LPF_CURRENT_D [rw],
+-,-,-
+45,PID_CURRENT_Q_P [rw],
+46,PID_CURRENT_Q_I [rw],
+47,PID_CURRENT_Q_D [rw],
+48,LPF_CURRENT_Q [rw],
+-,-,-
+50,PID_VELOCITY_P [rw],
+51,PID_VELOCITY_I [rw],
+52,PID_VELOCITY_D [rw],
+53,LPF_VELOCITY [rw],
+-,-,-
+55,P_ANGLE_P [rw],
+56,LPF_ANGLE [rw],
+-,,
+58,MOTION_DOWNSAMPLE [rw] [UINT32],
+59,MOTION_CNT [rw] [UINT32],
+-,,
+,=== Sensor settings ===,
+60,SENSOR_OFFSET [rw] [FLOAT32],
+61,ZERO_ELECTRIC_ANGLE [rw] [FLOAT32],
+62,SENSOR_DIRECTION [rw] [Direction],
+63,PP_CHECK_RESULT [rw] [BOOL],
+-,-,-
+,===== Virtual registers =====,
+64,MULTI_TARGET [w] [FLOAT16]x4,"Текущая уставка. Используется в комбинации с широковещательными пакетами, чтобы выставить уставку на 4 мотора сразу. Содержит 4 числа FLOAT16. Актуальное значение уставки определяется исходя из ID мотора"
+96,SHAFT_FEEDBACK [r] [FLOAT32]x2,"Значения SHAFT_VELOCITY и SHAFT_ANGLE"
+
+127,SAVE_TO_EEPROM [w],"При записи любого значения сохраняет текущие параметры настройки мотора в энергонезависимую память, откуда они будут восстановлены при следующем перезапуске"
