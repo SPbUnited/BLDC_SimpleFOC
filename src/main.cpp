@@ -8,6 +8,18 @@
 #include "encoders/as5048a/MagneticSensorAS5048A.h"
 // #include "encoders/MXLEMMING_observer/MXLEMMINGObserverSensor.h"
 
+const PinMap PinMap_SPI_MOSI[] = {
+    {PB_5, SPI3, STM_PIN_DATA(STM_MODE_AF_PP, GPIO_PULLUP, GPIO_AF6_SPI3)},
+};
+
+const PinMap PinMap_SPI_MISO[] = {
+    {PC_11, SPI3, STM_PIN_DATA(STM_MODE_AF_PP, GPIO_PULLUP, GPIO_AF6_SPI3)},
+};
+
+const PinMap PinMap_SPI_SCLK[] = {
+    {PC_10, SPI3, STM_PIN_DATA(STM_MODE_AF_PP, GPIO_PULLUP, GPIO_AF6_SPI3)},
+};
+
 static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData);
 static void init_CAN(void);
 SimpleCan can1(/*terminateTransceiver:*/true);
