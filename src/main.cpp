@@ -32,15 +32,15 @@ int8_t sen_dir = 0;
 bool motor_callibrated = false;
 bool motor_disabled = false;
 
-    
-CANFuocoMotorConfig motor_config = {.motor_id = 2,
+uint8_t motor_id = 9;    
+CANFuocoMotorConfig motor_config = {.motor_id = motor_id,
     // .get_supply_voltage = get_vbus,
     .motor = motor,
 };
 
 
 bool test_motor = true, use = true;
-uint8_t motor_id = 0;
+
 void setup() {
 
   // Serial.begin(115200);
@@ -73,12 +73,12 @@ motor.PID_velocity.D = 0.35; //0.0035
 
 
 motor.PID_current_d.P = 3;
-motor.PID_current_d.I = 3;
+motor.PID_current_d.I = 50;
 motor.PID_current_d.D = 0;
 motor.LPF_current_d = 0.002f;
 
 motor.PID_current_q.P = 3;
-motor.PID_current_q.I = 3;
+motor.PID_current_q.I = 50;
 motor.PID_current_q.D = 0;
 motor.LPF_current_q = 0.002f;
 
@@ -114,7 +114,7 @@ digitalWrite(pinNametoDigitalPin(PC_6), HIGH);
 digitalWrite(pinNametoDigitalPin(PB_13), LOW);
 digitalWrite(pinNametoDigitalPin(PB_11), HIGH);
 
-motor_config.motor_id = motor_id;
+// motor_configmotor_id = lol_id;
 motor.target = 0;
 init_CAN();
 }
@@ -246,17 +246,35 @@ float test_float = 0;
 double b14=0, a0=0, a4=0;
 bool error = false;
 void loop() {
-  if (get_motor_temp() < 50.0)
+  if (motor_id != 0)
   {
-    motor.loopFOC();
-    motor.move();
+    if (get_motor_temp() < 50.0)
+    {
+      motor.loopFOC();
+      motor.move();
+    }
+    else
+    {
+      error = true;
+      motor.target = 0;
+      motor.move();  
+      motor.disable();
+    }
+    if (error)
+    {
+      digitalWrite(PC6, HIGH);   
+      digitalWrite(PB11, LOW);   
+    }
+    else
+    {
+      digitalWrite(PC6, LOW);   
+      // digitalWrite(PB13, LOW);
+      digitalWrite(PB11, HIGH);   
+    }
   }
   else
   {
-    error = true;
-    motor.target = 0;
-    motor.move();  
-    motor.disable();
+    test_motor_tuda_syda(10, -5, 2000);
   }
   // if (error)
   // {

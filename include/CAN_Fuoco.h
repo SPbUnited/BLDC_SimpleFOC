@@ -111,7 +111,7 @@ enum CANFuocoRegisterMap
 
 struct CANFuocoMotorConfig
 {
-    int motor_id;
+    uint8_t& motor_id;
     float get_supply_voltage(void);
     BLDCMotor &motor;
     float speed = 0;
