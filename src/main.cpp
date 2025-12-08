@@ -5,9 +5,9 @@
 #include "encoders/MXLEMMING_observer/MXLEMMINGObserverSensor.h"
 // #include "MagneticSensorAS5600.h"
 //#include <pinout.h>
-float max_current = 2.0;
+float max_current = 1.0;
 // (Pole_pairs, resistance, kv, inductanse)
-BLDCMotor motor = BLDCMotor(1, 0.955, 1050, 0.0498 * 0.001); 
+BLDCMotor motor = BLDCMotor(2, 0.94, 770, 0.104 * 0.001); 
 uint32_t last_receive_timer = 0;
 BLDCDriver6PWM driver = BLDCDriver6PWM(PA8, PC13, PA9, PA12, PA10, PB15); 
 //MagneticSensorI2C sensor = MagneticSensorI2C(AS5600_I2C);
@@ -123,7 +123,7 @@ motor.PID_current_q.D = 0;
 motor.LPF_current_q = 0.002f;
 
   // open loop control config
-  motor.controller = MotionControlType::torque;
+  motor.controller = MotionControlType::velocity;
   motor.LPF_velocity = 0.5;
   // motor.PID_velocity.output_ramp = 1000;
   motor.motion_downsample = 3;
@@ -146,7 +146,7 @@ uint8_t motor_num = 1, robot = 1;
 motor.initFOC();
 pinMode(pinNametoDigitalPin(PC_6), OUTPUT);
 // digitalPin
-digitalWrite(pinNametoDigitalPin(PC_6), HIGH);
+digitalWrite(pinNametoDigitalPin(PC_6), LOW);
 }
 
 
@@ -198,7 +198,7 @@ void loop() {
       // float tmp_f = recievedSpeed * float(i);
       // if (tmp_f < -200) tmp_f = -200;
       // if (tmp_f > 200) tmp_f = 200;
-      motor.move(-0.85);
+      motor.move(-150);
       // motor.current_limit = max_current;
       // motor.PID_velocity.P = 0.75;
       // motor.PID_velocity.I = 0.1;
