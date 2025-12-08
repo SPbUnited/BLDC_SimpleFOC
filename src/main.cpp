@@ -1,3 +1,4 @@
+#include "SimpleFOCDrivers.h"
 #include <SimpleFOC.h>
 // #include "AS5600.h"
 #include <SimpleFOCDrivers.h>
@@ -131,6 +132,8 @@ motor.linkSensor(&new_sensor);
 //A - is the ID of drive
 
 motor.linkCurrentSense(&current_sense);
+motor.sensor_direction= Direction::UNKNOWN;
+
 motor.init();
 current_sense.init();
 
@@ -140,45 +143,10 @@ current_sense.init();
 use = false;
 test = true;
 uint8_t motor_num = 1, robot = 1;
-if(!test)
-{
-  if(robot == 1)
-  {
-    switch (motor_num)
-    {
-      case 1:
-      motor.sensor_direction = Direction::CCW;
-    motor.zero_electric_angle = 2.44;
-    commander.add('A', onMotor, "motor");
-    break;
-      case 2:
-      motor.sensor_direction = Direction::CW;
-    motor.zero_electric_angle = 2.14;    
-    commander.add('B', onMotor, "motor");
-    break;
-
-    case 3:
-    motor.sensor_direction = Direction::CW;
-    motor.zero_electric_angle = 1.36;
-    commander.add('C', onMotor, "motor");
-      break;
-    case 4:
-    motor.sensor_direction = Direction::CW;
-    motor.zero_electric_angle = 0.52;
-    commander.add('D', onMotor, "motor");
-      break;
-    }
-  }
-}
-else
-{
-  delay(7000);
-}
 motor.initFOC();
-
-Serial.println("Motor ready.");
-Serial.println("Torque mode.");
-
+pinMode(pinNametoDigitalPin(PC_6), OUTPUT);
+// digitalPin
+digitalWrite(pinNametoDigitalPin(PC_6), HIGH);
 }
 
 
@@ -237,35 +205,9 @@ void loop() {
       // motor.PID_velocity.D = 0.0035; 
       // motor.velocity_limit = 10000;
       // motor.PID_velocity.output_ramp = 1000;
-      //  motor.move(2);
-    /*}
-    else if(millis() - last_receive_timer < 20000)
-    {
-      motor.move(-1*0.10466);
-    }
-      else if(millis() - last_receive_timer < 1000)
-    {
-    // motor.LPF_velocity = 0.06;
-      motor.PID_velocity.P = 0.1;
-      motor.PID_velocity.I = 0.005;
-      motor.PID_velocity.D = 0.0;
-      motor.current_limit = 0.01;
-      motor.velocity_limit = 0.05;
-      motor.move(0);
-    }
-    else if(millis() - last_receive_timer < 1000)
-    {
-
-      motor.PID_velocity.P = 0.1;
-      motor.PID_velocity.I = 0.005;
-      motor.PID_velocity.D = 0.0; 
-      motor.velocity_limit = 0.05;
-      motor.PID_velocity.output_ramp = 1000;
-      motor.move(0);
-      }
-      else
-        last_receive_timer = millis();
-        */
+      // motor.move(10);
+      // static float recievedSpeed = 0;
+      // // motor.move(3.14);
     // motor.monitor();
   }
 }
