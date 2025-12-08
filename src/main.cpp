@@ -96,7 +96,7 @@ motor.LPF_current_q = 0.002f;
   motor.LPF_velocity = 0.3;
   motor.linkSensor(&new_sensor);
   motor.linkCurrentSense(&current_sense);
-  motor.sensor_direction = Direction::CCW;
+  motor.sensor_direction = Direction::CW;
 
   motor.init();
   current_sense.init();
