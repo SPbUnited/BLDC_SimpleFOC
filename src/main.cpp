@@ -229,24 +229,24 @@ float get_pcm_temp()
 
 uint32_t timer1 = 0;
 int8_t flag = 0;
-void test_motor_tuda_syda(float speed_forward, float speed_backward, uint32_t time_difference)
-{
-  if (millis() - timer1 >= time_difference)
-  {
-    flag += 1;
-    if (flag >= 3)
-      flag = 0;
-    timer1 = millis();
-  }
-  if (flag == 0)
-  {
-    motor.move(speed_forward);
-  }
-  else if (flag == 1)
-  {
-    motor.move(speed_backward);
-  }
-}
+// void test_motor_tuda_syda(float speed_forward, float speed_backward, uint32_t time_difference)
+// {
+//   if (millis() - timer1 >= time_difference)
+//   {
+//     flag += 1;
+//     if (flag >= 3)
+//       flag = 0;
+//     timer1 = millis();
+//   }
+//   if (flag == 0)
+//   {
+//     motor.move(speed_forward);
+//   }
+//   else if (flag == 1)
+//   {
+//     motor.move(speed_backward);
+//   }
+// }
 
 uint32_t save_com = 0;
 float test_float = 0;
@@ -281,9 +281,24 @@ void loop() {
   }
   else
   {
-    test_motor_tuda_syda(10, -5, 2000);
+    motor.loopFOC();
+    if (millis() - timer1 >= 2000)
+    {
+      flag += 1;
+      if (flag >= 2)
+        flag = 0;
+      timer1 = millis();
+    }
+    if (flag == 0)
+    {
+      motor.move(10);
+    }
+    else if (flag == 1)
+    {
+      motor.move(-5);
+    }
   }
-  // motor.loopFOC();
+  
   //   // motor.PID_velocity.output_ramp = 1000;
 
   // uint8_t arr[8] = { 0, 0x3C, 0, 0x3C, 1, 1, 1, 1};
