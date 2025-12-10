@@ -83,12 +83,12 @@ void setup() {
   motor.PID_velocity.D = 0.35; // 0.0035
 
 motor.PID_current_d.P = 3;
-motor.PID_current_d.I = 50;
+motor.PID_current_d.I = 150;
 motor.PID_current_d.D = 0;
 motor.LPF_current_d = 0.002f;
 
 motor.PID_current_q.P = 3;
-motor.PID_current_q.I = 50;
+motor.PID_current_q.I = 150;
 motor.PID_current_q.D = 0;
 motor.LPF_current_q = 0.002f;
 
