@@ -1,0 +1,125 @@
+// #include <Arduino.h>
+// #include <SimpleFOC.h>
+// #include <math.h>
+// #include <SimpleCan.h>
+
+// const int MotorPolePairs = 4;
+// const Direction MotorNaturalDirection = CCW;
+// const float MotorZeroElectricAngle = 5.235;
+
+// static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData);
+// static void init_CAN(void);
+// static String serialReceiveUserCommand(void);
+// static void Button_Down(void);
+// static float readNtc(void);
+// static float readVbus(void);
+
+// HardwareSerial Serial1(USART2_RX, USART2_TX);
+// BLDCDriver6PWM driver(PHASE_UH, PHASE_UL, PHASE_VH, PHASE_VL, PHASE_WH, PHASE_WL);
+// BLDCMotor motor(MotorPolePairs);
+// HallSensor sensor(HALL1, HALL2, HALL3, motor.pole_pairs);
+// SimpleCan can1(/*terminateTransceiver:*/true);
+// SimpleCan::RxHandler can1RxHandler(8, handleCanMessage);
+
+// FDCAN_TxHeaderTypeDef TxHeader;
+// uint8_t TxData[8];
+
+// static void hallA() { sensor.handleA(); }
+
+// static void hallB() { sensor.handleB(); }
+
+// static void hallC() { sensor.handleC(); }
+
+// void setup() {
+// 	Serial1.begin(115200);
+// 	Serial1.println();
+	
+// 	pinMode(LED_BUILTIN, OUTPUT);
+// 	attachInterrupt(digitalPinToInterrupt(BUTTON), Button_Down, LOW);
+
+// 	delay(100);
+
+// 	sensor.enableInterrupts(hallA, hallB, hallC);
+// 	sensor.init();
+
+// 	motor.linkDriver(&driver);
+// 	motor.linkSensor(&sensor);
+// 	motor.controller = ControlType::voltage;
+
+// 	driver.voltage_power_supply = 24;
+// 	motor.foc_modulation = FOCModulationType::Trapezoid_120;
+// 	motor.voltage_limit = 5;
+// 	motor.voltage_sensor_align = 1;
+// 	motor.useMonitoring(Serial1);
+
+// 	driver.init();
+// 	motor.init();
+// 	//motor.initFOC();
+// 	//Serial1.printf("zero electric angle: %10.4f\r\n", motor.zero_electric_angle);
+// 	motor.initFOC(MotorZeroElectricAngle, MotorNaturalDirection);
+
+// 	init_CAN();
+// }
+
+// void loop()
+// {
+// }
+
+
+// static float readVbus()
+// {
+// 	const int AdcMaxValue = 1023;
+// 	const float Factor = 3.3 / AdcMaxValue * (169.0 + 18.0) / 18.0;
+
+// 	return analogRead(VBUS) * Factor;
+// }
+
+// // static float readNtc() 
+// // {
+// // 	const float ResistorBalance = 4700.0;
+// // 	const int AdcMaxValue = 1023;
+// // 	const float Beta = 3425;
+// // 	const float RoomTemp = 298.15; //[K]
+// // 	const float ResistorNtcRoomTemp = 10000.0;
+// // 	const float Factor1 =  ResistorBalance * AdcMaxValue;
+// // 	const float Factor2 = Beta * RoomTemp;
+		
+// // 	float adcValue  = analogRead(TEMPERATURE);
+// // 	float resistorNtc = Factor1 / adcValue - ResistorBalance;
+// // 	float temperature = Factor2 / (Beta + RoomTemp * log(resistorNtc / ResistorNtcRoomTemp));
+
+// // 	return temperature - 273.15;
+// // }
+
+
+
+// static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
+// {
+// 	if ((rxHeader.Identifier != 0x321) || (rxHeader.IdType != FDCAN_STANDARD_ID) || (rxHeader.DataLength != FDCAN_DLC_BYTES_2))
+// 	{
+// 		return;
+// 	}
+
+// 	digitalToggle(LED_BUILTIN);
+// }
+
+// // static void Button_Down()
+// // {
+// // 	TxHeader.Identifier = 0x321;
+// // 	TxHeader.IdType = FDCAN_STANDARD_ID;
+// // 	TxHeader.TxFrameType = FDCAN_DATA_FRAME;
+// // 	TxHeader.DataLength = FDCAN_DLC_BYTES_2;
+// // 	TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+// // 	TxHeader.BitRateSwitch = FDCAN_BRS_OFF;
+// // 	TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
+// // 	TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+// // 	TxHeader.MessageMarker = 0;
+
+// // 	TxData[0] = 0x13;
+// // 	TxData[1] = 0xAD;
+
+// // 	Serial1.print("CAN: sending message ");
+// // 	Serial1.println(can1.addMessageToTxFifoQ(&TxHeader, TxData) == HAL_OK
+// // 		? "was ok."
+// // 		: "failed.");
+// // }
