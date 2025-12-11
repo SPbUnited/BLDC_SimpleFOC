@@ -1,0 +1,3 @@
+[submodule "src/STM32_CAN"]
+	path = src/STM32_CAN
+	url = https://github.com/duckylotl/STM32_CAN
