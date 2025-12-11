@@ -42,15 +42,17 @@ int8_t sen_dir = 0;
 bool motor_callibrated = false;
 bool motor_disabled = false;
 
-uint8_t motor_id = 0;    
-CANFuocoMotorConfig motor_config = {.motor_id = motor_id,
+uint8_t motor_id = 0;
+CANFuocoMotorConfig motor_config = {
+    .motor_id = motor_id,
     // .get_supply_voltage = get_vbus,
     .motor = motor,
 };
 
 bool test_motor = true, use = true;
 
-void setup() {
+void setup()
+{
 
   // Serial.begin(115200);
   // new_sensor.closeTransactions = true;
@@ -82,15 +84,15 @@ void setup() {
   motor.PID_velocity.I = 2;
   motor.PID_velocity.D = 0.35; // 0.0035
 
-motor.PID_current_d.P = 3;
-motor.PID_current_d.I = 150;
-motor.PID_current_d.D = 0;
-motor.LPF_current_d = 0.002f;
+  motor.PID_current_d.P = 3;
+  motor.PID_current_d.I = 150;
+  motor.PID_current_d.D = 0;
+  motor.LPF_current_d = 0.002f;
 
-motor.PID_current_q.P = 3;
-motor.PID_current_q.I = 150;
-motor.PID_current_q.D = 0;
-motor.LPF_current_q = 0.002f;
+  motor.PID_current_q.P = 3;
+  motor.PID_current_q.I = 150;
+  motor.PID_current_q.D = 0;
+  motor.LPF_current_q = 0.002f;
 
   motor.controller = MotionControlType::velocity;
   motor.LPF_velocity = 0.3;
@@ -123,9 +125,9 @@ motor.LPF_current_q = 0.002f;
   digitalWrite(pinNametoDigitalPin(PB_13), LOW);
   digitalWrite(pinNametoDigitalPin(PB_11), HIGH);
 
-// motor_configmotor_id = lol_id;
-motor.target = 0;
-init_CAN();
+  // motor_configmotor_id = lol_id;
+  motor.target = 0;
+  init_CAN();
 }
 
 CANFuoco can_fuoco(motor_config);
@@ -155,13 +157,13 @@ bool start = false;
 static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
 {
 
-  if (rxHeader.Identifier == 0x40)
+  if ((rxHeader.Identifier >> 8) == motor_id || (rxHeader.Identifier >> 8) == 0)
   {
     // digitalToggle(PB13);
     color += 1;
     if (color % 100 == 0)
       digitalToggle(PB13);
-    can_fuoco.can_rx_callback(rxHeader.Identifier, 8, rxData);
+    can_fuoco.can_rx_callback(rxHeader.Identifier & 0xFF, rxHeader.DataLength, rxData);
   }
 }
 
@@ -252,7 +254,8 @@ uint32_t save_com = 0;
 float test_float = 0;
 double b14 = 0, a0 = 0, a4 = 0;
 bool error = false;
-void loop() {
+void loop()
+{
   if (motor_id != 0)
   {
     if (get_motor_temp() < 50.0)
@@ -264,19 +267,19 @@ void loop() {
     {
       error = true;
       motor.target = 0;
-      motor.move();  
+      motor.move();
       motor.disable();
     }
     if (error)
     {
-      digitalWrite(PC6, HIGH);   
-      digitalWrite(PB11, LOW);   
+      digitalWrite(PC6, HIGH);
+      digitalWrite(PB11, LOW);
     }
     else
     {
-      digitalWrite(PC6, LOW);   
+      digitalWrite(PC6, LOW);
       // digitalWrite(PB13, LOW);
-      digitalWrite(PB11, HIGH);   
+      digitalWrite(PB11, HIGH);
     }
   }
   else
@@ -298,7 +301,7 @@ void loop() {
       motor.move(-5);
     }
   }
-  
+
   //   // motor.PID_velocity.output_ramp = 1000;
 
   // uint8_t arr[8] = { 0, 0x3C, 0, 0x3C, 1, 1, 1, 1};
