@@ -1,13 +1,13 @@
 #include "SimpleCan.h"
-#define CAN_TERM      PC14
-#define CAN_SHDN      PC11
+#define CAN_TERM PC14
+#define CAN_SHDN PC11
 // will be called from: HAL_FDCAN_Init
 extern "C" void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef *hfdcan);
 extern "C" void FDCAN1_IT0_IRQHandler();
 extern "C" void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs);
 
-FDCAN_HandleTypeDef SimpleCan::_hfdcan1 = { };
-SimpleCan::RxHandler* SimpleCan::_rxHandler = NULL;
+FDCAN_HandleTypeDef SimpleCan::_hfdcan1 = {};
+SimpleCan::RxHandler *SimpleCan::_rxHandler = NULL;
 
 SimpleCan::SimpleCan(bool terminateTransceiver)
 {
@@ -39,19 +39,19 @@ HAL_StatusTypeDef SimpleCan::stop(void)
 HAL_StatusTypeDef SimpleCan::init(CanSpeed speed)
 {
 	FDCAN_InitTypeDef *init = &_hfdcan1.Init;
-	
+
 	init->ClockDivider = FDCAN_CLOCK_DIV1;
 	init->FrameFormat = FDCAN_FRAME_FD_BRS;
 	init->Mode = FDCAN_MODE_NORMAL;
 	init->AutoRetransmission = DISABLE;
 	init->TransmitPause = ENABLE;
 	init->ProtocolException = DISABLE;
-	
+
 	// 1 MBit: NominalPrescaler = 10
 	// see: http://www.bittiming.can-wiki.info/
-	// 170MHz / Prescaler / SyncJumpWith / (TimeSeg1 + TimeSeg2 + SyncSeg) 
+	// 170MHz / Prescaler / SyncJumpWith / (TimeSeg1 + TimeSeg2 + SyncSeg)
 	// SyncSeg = SYNC_SEG = 1, TimeSeg1 = PROP_SEG + PHASE_SEG1, TimeSeg2 = PHASE_SEG2
-	init->NominalPrescaler = (uint16_t) speed;
+	init->NominalPrescaler = (uint16_t)speed;
 	init->NominalSyncJumpWidth = 1;
 	init->NominalTimeSeg1 = 14;
 	init->NominalTimeSeg2 = 2;
@@ -63,7 +63,7 @@ HAL_StatusTypeDef SimpleCan::init(CanSpeed speed)
 	init->StdFiltersNbr = 1;
 	init->ExtFiltersNbr = 0;
 	init->TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
-	
+
 	return HAL_FDCAN_Init(&_hfdcan1);
 }
 
@@ -116,10 +116,10 @@ void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef *hfdcan)
 		return;
 	}
 
-	RCC_PeriphCLKInitTypeDef periphClkInit = { };
-	
+	RCC_PeriphCLKInitTypeDef periphClkInit = {};
+
 	HAL_RCCEx_GetPeriphCLKConfig(&periphClkInit);
-	
+
 	// Initializes the peripherals clocks
 	periphClkInit.PeriphClockSelection |= RCC_PERIPHCLK_FDCAN;
 	periphClkInit.FdcanClockSelection = RCC_FDCANCLKSOURCE_PCLK1;
@@ -127,16 +127,16 @@ void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef *hfdcan)
 	{
 		Error_Handler();
 	}
-	
+
 	// Peripheral clock enable
 	__HAL_RCC_FDCAN_CLK_ENABLE();
 
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
-	
+
 	// FDCAN1 GPIO Configuration
 	// PA11 ------> FDCAN1_RX
-	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	GPIO_InitStruct.Pin = GPIO_PIN_11;
 	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -144,7 +144,7 @@ void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef *hfdcan)
 	GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	// PB9 ------> FDCAN1_TX 
+	// PB9 ------> FDCAN1_TX
 	GPIO_InitStruct.Pin = GPIO_PIN_9;
 	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -182,7 +182,7 @@ SimpleCan::RxHandler::RxHandler(uint16_t dataLength, void (*callback)(FDCAN_RxHe
 
 SimpleCan::RxHandler::~RxHandler()
 {
-	delete[] _rxData; 
+	delete[] _rxData;
 }
 
 void SimpleCan::RxHandler::notify(FDCAN_HandleTypeDef *hfdcan)

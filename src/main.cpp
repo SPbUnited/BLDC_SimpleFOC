@@ -9,21 +9,15 @@ SimpleCan::RxHandler can1RxHandler(8, handleCanMessage);
 FDCAN_TxHeaderTypeDef TxHeader;
 uint8_t TxData[8];
 
-// #include "AS5600.h"
-// #include <SimpleFOCDrivers.h>
 #include "encoders/MXLEMMING_observer/MXLEMMINGObserverSensor.h"
-// #include "MagneticSensorAS5600.h"
-//#include <pinout.h>
+
 float max_current = 2.0;
 // (Pole_pairs, resistance, kv, inductanse)
-BLDCMotor motor = BLDCMotor(1, 0.94, 770, 0.104 * 0.001); 
+BLDCMotor motor = BLDCMotor(1, 0.94, 770, 0.104 * 0.001);
 uint32_t last_receive_timer = 0;
-BLDCDriver6PWM driver = BLDCDriver6PWM(PA8, PC13, PA9, PA12, PA10, PB15); 
-//MagneticSensorI2C sensor = MagneticSensorI2C(AS5600_I2C);
-// MagneticSensorAS5600 new_sensor;1 2 3 3 1 2 2 3 1
-    //                             3 2 1 1 3 2 2 1 3
-HallSensor new_sensor(PB6,PB7,PB8,1);
+BLDCDriver6PWM driver = BLDCDriver6PWM(PA8, PC13, PA9, PA12, PA10, PB15);
 
+HallSensor new_sensor(PB6, PB7, PB8, 1);
 
 // MXLEMMINGObserverSensor new_sensor = MXLEMMINGObserverSensor(motor);
 LowsideCurrentSense current_sense = LowsideCurrentSense(0.003f, -9.0f, A_OP1_OUT, A_OP2_OUT, A_OP3_OUT);
@@ -32,19 +26,17 @@ int8_t sen_dir = 0;
 bool motor_callibrated = false;
 bool motor_disabled = false;
 
-uint8_t motor_id = 0;    
-CANFuocoMotorConfig motor_config = {.motor_id = motor_id,
+uint8_t motor_id = 0;
+CANFuocoMotorConfig motor_config = {
+    .motor_id = motor_id,
     // .get_supply_voltage = get_vbus,
     .motor = motor,
 };
 
-
-
 bool test = true, use = false;
 
-void setup() {
-  // new_sensor.closeTransactions = true;
-  // new_sensor.useHysteresis = false;
+void setup()
+{
   new_sensor.pullup = Pullup::USE_INTERN;
   new_sensor.init();
   // driver config
@@ -57,48 +49,44 @@ void setup() {
   motor.linkDriver(&driver);
   current_sense.skip_align = true;
   current_sense.linkDriver(&driver);
-  // motor.sensor_direction = Direction::CW;
-  // limiting motor movements
   motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
   motor.torque_controller = TorqueControlType::foc_current;
- motor.monitor_variables = _MON_TARGET|_MON_ANGLE|_MON_VEL;
-  // motor.monitor_variables = _MON_CURR_Q;
+  motor.monitor_variables = _MON_TARGET | _MON_ANGLE | _MON_VEL;
   motor.monitor_downsample = 300;
- // motor.LPF_current_d.Tf = 0.01;
-  //motor.LPF_current_q.Tf = 0.01;
+  // motor.LPF_current_d.Tf = 0.01;
+  // motor.LPF_current_q.Tf = 0.01;
   // motor.voltage_limit = 12;   // [V]
   motor.current_limit = max_current;
   motor.velocity_limit = 10000; // [rad/s]
   // default P=0.5 I = 10 D = 0
-motor.PID_velocity.P = 1.5;
-motor.PID_velocity.I = 0.1;
-motor.PID_velocity.D = 0;//0.001;//0.0035; //0.0035
+  motor.PID_velocity.P = 1.5;
+  motor.PID_velocity.I = 0.1;
+  motor.PID_velocity.D = 0; // 0.001;//0.0035; //0.0035
 
+  motor.PID_current_d.P = 0.7; // 2.75;
+  motor.PID_current_d.I = 1;
+  motor.PID_current_d.D = 0;
+  motor.LPF_current_d = 0.002f;
 
-motor.PID_current_d.P = 0.7;//2.75;
-motor.PID_current_d.I = 1;
-motor.PID_current_d.D = 0;
-motor.LPF_current_d = 0.002f;
-
-motor.PID_current_q.P = 0.7;//2.75;
-motor.PID_current_q.I = 1;
-motor.PID_current_q.D = 0;
-motor.LPF_current_q = 0.002f;
+  motor.PID_current_q.P = 0.7; // 2.75;
+  motor.PID_current_q.I = 1;
+  motor.PID_current_q.D = 0;
+  motor.LPF_current_q = 0.002f;
 
   motor.controller = MotionControlType::velocity;
   motor.LPF_velocity = 0.05;
   // motor.PID_velocity.output_ramp = 1000;
   motor.motion_downsample = 0;
   // init motor hardware
-  
-motor.linkSensor(&new_sensor);
-//A - is the ID of drive
 
-motor.linkCurrentSense(&current_sense);
-// motor.sensor_direction= Direction::UNKNOWN;
-new_sensor.electric_rotations = 0;
-motor.init();
-current_sense.init();
+  motor.linkSensor(&new_sensor);
+  // A - is the ID of drive
+
+  motor.linkCurrentSense(&current_sense);
+  // motor.sensor_direction= Direction::UNKNOWN;
+  new_sensor.electric_rotations = 0;
+  motor.init();
+  current_sense.init();
 
   use = false;
   uint8_t motor_num = 1, robot = 1;
@@ -116,15 +104,14 @@ current_sense.init();
   uint8_t A2 = (~digitalRead(PB3) & 0x01) << 2;
   motor_id = A0 + A1 + A2;
 
-motor.initFOC();
+  motor.initFOC();
 
   digitalWrite(pinNametoDigitalPin(PC_6), HIGH);
   digitalWrite(pinNametoDigitalPin(PB_13), LOW);
   digitalWrite(pinNametoDigitalPin(PB_11), HIGH);
 
-
-motor.target = 0;
-init_CAN();
+  motor.target = 0;
+  init_CAN();
 }
 
 CANFuoco can_fuoco(motor_config);
@@ -214,44 +201,35 @@ float get_pcm_temp()
 //     }
 //     return save_com;
 // }
-// uint32_t timer2 = 0;
-// int package_recived_per_second()
-// {
-//   if (millis() - timer2 >= 1000)
-//     {
-//       save_com = color;
-//       color = 0;
-//       timer2 = millis();
-//     }
-//     return save_com;
-// }
 
 uint32_t timer1 = 0;
 int8_t flag = 0;
-// void test_motor_tuda_syda(float speed_forward, float speed_backward, uint32_t time_difference)
-// {
-//   if (millis() - timer1 >= time_difference)
-//   {
-//     flag += 1;
-//     if (flag >= 3)
-//       flag = 0;
-//     timer1 = millis();
-//   }
-//   if (flag == 0)
-//   {
-//     motor.move(speed_forward);
-//   }
-//   else if (flag == 1)
-//   {
-//     motor.move(speed_backward);
-//   }
-// }
+void test_motor_tuda_syda(float speed_forward, float speed_backward, uint32_t time_difference)
+{
+  motor.loopFOC();
+  if (millis() - timer1 >= time_difference)
+  {
+    flag += 1;
+    if (flag >= 3)
+      flag = 0;
+    timer1 = millis();
+  }
+  if (flag == 0)
+  {
+    motor.move(speed_forward);
+  }
+  else if (flag == 1)
+  {
+    motor.move(speed_backward);
+  }
+}
 
 uint32_t save_com = 0;
 float test_float = 0;
 double b14 = 0, a0 = 0, a4 = 0;
 bool error = false;
-void loop() {
+void loop()
+{
   if (motor_id != 0)
   {
     if (get_motor_temp() < 50.0)
@@ -263,41 +241,26 @@ void loop() {
     {
       error = true;
       motor.target = 0;
-      motor.move();  
+      motor.move();
       motor.disable();
     }
     if (error)
     {
-      digitalWrite(PC6, HIGH);   
-      digitalWrite(PB11, LOW);   
+      digitalWrite(PC6, HIGH);
+      digitalWrite(PB11, LOW);
     }
     else
     {
-      digitalWrite(PC6, LOW);   
+      digitalWrite(PC6, LOW);
       // digitalWrite(PB13, LOW);
-      digitalWrite(PB11, HIGH);   
+      digitalWrite(PB11, HIGH);
     }
   }
   else
   {
-    motor.loopFOC();
-    if (millis() - timer1 >= 2000)
-    {
-      flag += 1;
-      if (flag >= 2)
-        flag = 0;
-      timer1 = millis();
-    }
-    if (flag == 0)
-    {
-      motor.move(10);
-    }
-    else if (flag == 1)
-    {
-      motor.move(-5);
-    }
+    test_motor_tuda_syda(100, -200, 5000);
   }
-  
+
   //   // motor.PID_velocity.output_ramp = 1000;
 
   // uint8_t arr[8] = { 0, 0x3C, 0, 0x3C, 1, 1, 1, 1};
