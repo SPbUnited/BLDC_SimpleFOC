@@ -141,14 +141,14 @@ bool start = false;
 static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
 {
 
-  if (rxHeader.Identifier == 0x40)
-  {
-    // digitalToggle(PB13);
-    color += 1;
-    if (color % 100 == 0)
-      digitalToggle(PB13);
-    can_fuoco.can_rx_callback(rxHeader.Identifier, 8, rxData);
-  }
+  // if (rxHeader.Identifier == 0x40)
+  // {
+  // digitalToggle(PB13);
+  color += 1;
+  if (color % 100 == 0)
+    digitalToggle(PB13);
+  can_fuoco.can_rx_callback(rxHeader.Identifier, rxHeader.DataLength, rxData);
+  // }
 }
 
 void send_message()
@@ -232,7 +232,7 @@ void loop()
 {
   if (motor_id != 0)
   {
-    if (get_motor_temp() < 50.0)
+    if (get_motor_temp() < 50.0 || get_pcm_temp() < 60.0)
     {
       motor.loopFOC();
       motor.move();
