@@ -3,7 +3,7 @@
 #include <SPI.h>
 #include <SimpleCan.h>
 #define SPI_SR_TXP
-#include "../include/CAN_Fuoco.h"
+#include "CAN_Fuoco.h"
 // #include "encoders/as5048a/AS5048A.h"
 #include "encoders/as5048a/MagneticSensorAS5048A.h"
 // #include "encoders/MXLEMMING_observer/MXLEMMINGObserverSensor.h"
