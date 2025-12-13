@@ -144,10 +144,14 @@ static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
   // if (rxHeader.Identifier == 0x40)
   // {
   // digitalToggle(PB13);
-  color += 1;
-  if (color % 100 == 0)
-    digitalToggle(PB13);
-  can_fuoco.can_rx_callback(rxHeader.Identifier, rxHeader.DataLength, rxData);
+  if ((rxHeader.Identifier >> 8) == motor_id || (rxHeader.Identifier >> 8) == 0)
+  {
+    // digitalToggle(PB13);
+    color += 1;
+    if (color % 100 == 0)
+      digitalToggle(PB13);
+    can_fuoco.can_rx_callback(rxHeader.Identifier & 0xFF, rxHeader.DataLength, rxData);
+  }
   // }
 }
 
@@ -204,6 +208,7 @@ float get_pcm_temp()
 
 uint32_t timer1 = 0;
 int8_t flag = 0;
+uint8_t test_flag = 0;
 void test_motor_tuda_syda(float speed_forward, float speed_backward, uint32_t time_difference)
 {
   motor.loopFOC();
@@ -230,7 +235,7 @@ double b14 = 0, a0 = 0, a4 = 0;
 bool error = false;
 void loop()
 {
-  if (motor_id != 0)
+  if (motor_id != 5)
   {
     if (get_motor_temp() < 50.0 || get_pcm_temp() < 60.0)
     {
@@ -258,7 +263,35 @@ void loop()
   }
   else
   {
-    test_motor_tuda_syda(100, -200, 5000);
+    test_motor_tuda_syda(100, -200, 6000);
+    color += 1;
+    if (color % 100 == 0)
+    {
+      test_flag += 1;
+    }
+    if (test_flag == 0)
+    {
+      digitalWrite(PC6, LOW);
+      digitalWrite(PB13, HIGH);
+      digitalWrite(PB11, HIGH);
+    }
+    else if (test_flag == 1)
+    {
+      digitalWrite(PC6, HIGH);
+      digitalWrite(PB13, LOW);
+      digitalWrite(PB11, HIGH);
+    }
+    else
+    {
+      digitalWrite(PC6, HIGH);
+      digitalWrite(PB13, HIGH);
+      digitalWrite(PB11, LOW);
+    }
+    if (test_flag >= 3)
+    {
+      test_flag = 0;
+    }
+    
   }
 
   //   // motor.PID_velocity.output_ramp = 1000;
