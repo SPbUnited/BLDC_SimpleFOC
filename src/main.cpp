@@ -263,7 +263,7 @@ void loop()
   }
   else
   {
-    test_motor_tuda_syda(100, -200, 6000);
+    test_motor_tuda_syda(300, -200, 6000);
     color += 1;
     if (color % 100 == 0)
     {
