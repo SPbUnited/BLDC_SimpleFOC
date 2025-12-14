@@ -83,29 +83,36 @@ enum CANFuocoRegisterMap
     PID_CURRENT_D_P_RW = 40,
     PID_CURRENT_D_I_RW = 41,
     PID_CURRENT_D_D_RW = 42,
-    LPF_CURRENT_D_RW = 43,
-    PID_CURRENT_Q_P_RW = 45,
-    PID_CURRENT_Q_I_RW = 46,
-    PID_CURRENT_Q_D_RW = 47,
-    LPF_CURRENT_Q_RW = 48,
-    PID_VELOCITY_P_RW = 50,
-    PID_VELOCITY_I_RW = 51,
-    PID_VELOCITY_D_RW = 52,
-    LPF_VELOCITY_RW = 53,
-    P_ANGLE_P_RW = 55,
-    LPF_ANGLE_RW = 56,
-    MOTION_DOWNSAMPLE_RW = 58,
-    MOTION_CNT_RW = 59,
+    PID_CURREND_D_OUTPUT_RAMP_RW = 43,
+    PID_CURRENT_D_LIMIT_RW = 44,
+    LPF_CURRENT_D_TF_RW = 45,
+    PID_CURRENT_Q_P_RW = 46,
+    PID_CURRENT_Q_I_RW = 47,
+    PID_CURRENT_Q_D_RW = 48,
+    PID_CURRENT_Q_OUTPUT_RAMP_RW = 49,
+    PID_CURRENT_Q_LIMIT_RW = 50,
+    LPF_CURRENT_Q_TF_RW = 51,
+    PID_VELOCITY_P_RW = 52,
+    PID_VELOCITY_I_RW = 53,
+    PID_VELOCITY_D_RW = 54,
+    PID_VELOCITY_OUTPUT_RAMP_RW = 55,
+    PID_VELOCITY_LIMIT_RW = 56,
+    LPF_VELOCITY_TF_RW = 57,
+    P_ANGLE_P_RW = 58,
+    P_ANGLE_LIMIT_RW = 59,
+    LPF_ANGLE_TF_RW = 60,
+    MOTION_DOWNSAMPLE_RW = 61,
+    MOTION_CNT_RW = 62,
 
     // Sensor settings
-    SENSOR_OFFSET_RW = 60,
-    ZERO_ELECTRIC_ANGLE_RW = 61,
-    SENSOR_DIRECTION_RW = 62,
-    PP_CHECK_RESULT_RW = 63,
+    SENSOR_OFFSET_RW = 63,
+    ZERO_ELECTRIC_ANGLE_RW = 64,
+    SENSOR_DIRECTION_RW = 65,
+    PP_CHECK_RESULT_RW = 66,
 
     // Virtual registers
-    MULTI_TARGET_W = 64,
-    SHAFT_FEEDBACK_R = 96,
+    MULTI_TARGET_W = 96,
+    SHAFT_FEEDBACK_R = 102,
     SAVE_TO_EEPROM_W = 127,
 };
 
@@ -173,17 +180,24 @@ CANFuoco::CANFuoco(
         {PID_CURRENT_D_P_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.P)},
         {PID_CURRENT_D_I_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.I)},
         {PID_CURRENT_D_D_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.D)},
-        {LPF_CURRENT_D_RW, reinterpret_cast<uint8_t *>(&motor.LPF_current_d.Tf)},
+        {PID_CURREND_D_OUTPUT_RAMP_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.output_ramp)},
+        {PID_CURRENT_D_LIMIT_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.limit)},
+        {LPF_CURRENT_D_TF_RW, reinterpret_cast<uint8_t *>(&motor.LPF_current_d.Tf)},
         {PID_CURRENT_Q_P_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.P)},
         {PID_CURRENT_Q_I_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.I)},
         {PID_CURRENT_Q_D_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.D)},
-        {LPF_CURRENT_Q_RW, reinterpret_cast<uint8_t *>(&motor.LPF_current_q.Tf)},
+        {PID_CURRENT_Q_OUTPUT_RAMP_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.output_ramp)},
+        {PID_CURRENT_Q_LIMIT_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.limit)},
+        {LPF_CURRENT_Q_TF_RW, reinterpret_cast<uint8_t *>(&motor.LPF_current_q.Tf)},
         {PID_VELOCITY_P_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.P)},
         {PID_VELOCITY_I_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.I)},
         {PID_VELOCITY_D_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.D)},
-        {LPF_VELOCITY_RW, reinterpret_cast<uint8_t *>(&motor.LPF_velocity.Tf)},
+        {PID_VELOCITY_OUTPUT_RAMP_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.output_ramp)},
+        {PID_VELOCITY_LIMIT_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.limit)},
+        {LPF_VELOCITY_TF_RW, reinterpret_cast<uint8_t *>(&motor.LPF_velocity.Tf)},
         {P_ANGLE_P_RW, reinterpret_cast<uint8_t *>(&motor.P_angle.P)},
-        {LPF_ANGLE_RW, reinterpret_cast<uint8_t *>(&motor.LPF_angle.Tf)},
+        {P_ANGLE_LIMIT_RW, reinterpret_cast<uint8_t *>(&motor.P_angle.limit)},
+        {LPF_ANGLE_TF_RW, reinterpret_cast<uint8_t *>(&motor.LPF_angle.Tf)},
         {MOTION_DOWNSAMPLE_RW, reinterpret_cast<uint8_t *>(&motor.motion_downsample)},
         {MOTION_CNT_RW, reinterpret_cast<uint8_t *>(&motor.motion_cnt)},
         {SENSOR_OFFSET_RW, reinterpret_cast<uint8_t *>(&motor.sensor_offset)},
@@ -226,17 +240,24 @@ void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
     case PID_CURRENT_D_P_RW:
     case PID_CURRENT_D_I_RW:
     case PID_CURRENT_D_D_RW:
-    case LPF_CURRENT_D_RW:
+    case PID_CURREND_D_OUTPUT_RAMP_RW:
+    case PID_CURRENT_D_LIMIT_RW:
+    case LPF_CURRENT_D_TF_RW:
     case PID_CURRENT_Q_P_RW:
     case PID_CURRENT_Q_I_RW:
     case PID_CURRENT_Q_D_RW:
-    case LPF_CURRENT_Q_RW:
+    case PID_CURRENT_Q_OUTPUT_RAMP_RW:
+    case PID_CURRENT_Q_LIMIT_RW:
+    case LPF_CURRENT_Q_TF_RW:
     case PID_VELOCITY_P_RW:
     case PID_VELOCITY_I_RW:
-    case PID_VELOCITY_D_RW:
-    case LPF_VELOCITY_RW:
+    case PID_VELOCITY_D_RW:    
+    case PID_VELOCITY_OUTPUT_RAMP_RW:
+    case PID_VELOCITY_LIMIT_RW:
+    case LPF_VELOCITY_TF_RW:
     case P_ANGLE_P_RW:
-    case LPF_ANGLE_RW:
+    case P_ANGLE_LIMIT_RW:
+    case LPF_ANGLE_TF_RW:
     case MOTION_DOWNSAMPLE_RW:
     case MOTION_CNT_RW:
     case SENSOR_OFFSET_RW:
@@ -315,17 +336,24 @@ bool CANFuoco::can_tx_callback(uint8_t *buf)
     case PID_CURRENT_D_P_RW:
     case PID_CURRENT_D_I_RW:
     case PID_CURRENT_D_D_RW:
-    case LPF_CURRENT_D_RW:
+    case PID_CURREND_D_OUTPUT_RAMP_RW:
+    case PID_CURRENT_D_LIMIT_RW:
+    case LPF_CURRENT_D_TF_RW:
     case PID_CURRENT_Q_P_RW:
     case PID_CURRENT_Q_I_RW:
     case PID_CURRENT_Q_D_RW:
-    case LPF_CURRENT_Q_RW:
+    case PID_CURRENT_Q_OUTPUT_RAMP_RW:
+    case PID_CURRENT_Q_LIMIT_RW:
+    case LPF_CURRENT_Q_TF_RW:
     case PID_VELOCITY_P_RW:
     case PID_VELOCITY_I_RW:
     case PID_VELOCITY_D_RW:
-    case LPF_VELOCITY_RW:
+    case PID_VELOCITY_OUTPUT_RAMP_RW:
+    case PID_VELOCITY_LIMIT_RW:
+    case LPF_VELOCITY_TF_RW:
     case P_ANGLE_P_RW:
-    case LPF_ANGLE_RW:
+    case P_ANGLE_LIMIT_RW:
+    case LPF_ANGLE_TF_RW:
     case MOTION_DOWNSAMPLE_RW:
     case MOTION_CNT_RW:
     case SENSOR_OFFSET_RW:

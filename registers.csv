@@ -1,6 +1,10 @@
-0,EMERGENCY_STOP [w],Аварийный останов. При записи любого значения драйвер полностью обесточивает электропривод на 15 секунд
-1,SUPPLY_VOLTAGE [r],Напряжение питания
-4,MONITOR_SETTINGS [rw],"Настройка мониторинга. Значение регистра указывает на то, какой регистр будет отправлятся в обратной связи от драйвера"
+0,EMERGENCY_STOP [w] [ANY],Аварийный останов. При записи любого значения драйвер полностью обесточивает электропривод на 15 секунд
+1,SUPPLY_VOLTAGE [r] [FLOAT32],Напряжение питания
+4,MONITOR_SETTINGS [rw] [CANFuocoMonitorSettings],"Настройка мониторинга. Значение регистра указывает на то, какой регистр будет отправлятся в обратной связи от драйвера
+struct CANFuocoMonitorSettings
+{
+    CANFuocoRegisterMap register_to_monitor;
+};"
 -,-,-
 ,===== SimpleFOC =====,
 ,=== State variables ===,
@@ -67,35 +71,43 @@ enum MotionControlType : uint8_t {
 };"
 -,-,-
 ,=== Controller and low pass filter settings ===,
-40,PID_CURRENT_D_P [rw],
-41,PID_CURRENT_D_I [rw],
-42,PID_CURRENT_D_D [rw],
-43,LPF_CURRENT_D [rw],
+40,PID_CURRENT_D_P [rw] [FLOAT32],
+41,PID_CURRENT_D_I [rw] [fFLOAT32],
+42,PID_CURRENT_D_D [rw] [fFLOAT32],
+43,PID_CURRENT_D_OUTPUT_RAMP [rw] [FLOAT32],
+44,PID_CURRENT_D_LIMIT [rw] [FLOAT32],
+45,LPF_CURRENT_D_TF [rw] [fFLOAT32],
 -,-,-
-45,PID_CURRENT_Q_P [rw],
-46,PID_CURRENT_Q_I [rw],
-47,PID_CURRENT_Q_D [rw],
-48,LPF_CURRENT_Q [rw],
+46,PID_CURRENT_Q_P [rw] [fFLOAT32],
+47,PID_CURRENT_Q_I [rw] [fFLOAT32],
+48,PID_CURRENT_Q_D [rw] [fFLOAT32],
+49,PID_CURRENT_Q_OUTPUT_RAMP [rw] [FLOAT32],
+50,PID_CURRENT_Q_LIMIT [rw] [FLOAT32],
+51,LPF_CURRENT_Q_TF [rw] [fFLOAT32],
 -,-,-
-50,PID_VELOCITY_P [rw],
-51,PID_VELOCITY_I [rw],
-52,PID_VELOCITY_D [rw],
-53,LPF_VELOCITY [rw],
+52,PID_VELOCITY_P [rw] [fFLOAT32],
+53,PID_VELOCITY_I [rw] [fFLOAT32],
+54,PID_VELOCITY_D [rw] [fFLOAT32],
+55,PID_VELOCITY_OUTPUT_RAMP [rw] [FLOAT32],
+56,PID_VELOCITY_LIMIT [rw] [FLOAT32],
+57,LPF_VELOCITY_TF [rw] [fFLOAT32],
 -,-,-
-55,P_ANGLE_P [rw],
-56,LPF_ANGLE [rw],
+58,P_ANGLE_P [rw] [fFLOAT32],
+59,P_ANGLE_LIMIT [rw] [FLOAT32],
+60,LPF_ANGLE_TF [rw] [fFLOAT32],
 -,,
-58,MOTION_DOWNSAMPLE [rw] [UINT32],
-59,MOTION_CNT [rw] [UINT32],
+61,MOTION_DOWNSAMPLE [rw] [UINT32],
+62,MOTION_CNT [rw] [UINT32],
 -,,
 ,=== Sensor settings ===,
-60,SENSOR_OFFSET [rw] [FLOAT32],
-61,ZERO_ELECTRIC_ANGLE [rw] [FLOAT32],
-62,SENSOR_DIRECTION [rw] [Direction],
-63,PP_CHECK_RESULT [rw] [BOOL],
+63,SENSOR_OFFSET [rw] [FLOAT32],
+64,ZERO_ELECTRIC_ANGLE [rw] [FLOAT32],
+65,SENSOR_DIRECTION [rw] [Direction],
+66,PP_CHECK_RESULT [rw] [BOOL],
 -,-,-
 ,===== Virtual registers =====,
-64,MULTI_TARGET [w] [FLOAT16]x4,"Текущая уставка. Используется в комбинации с широковещательными пакетами, чтобы выставить уставку на 4 мотора сразу. Содержит 4 числа FLOAT16. Актуальное значение уставки определяется исходя из ID мотора"
-96,SHAFT_FEEDBACK [r] [FLOAT32]x2,"Значения SHAFT_VELOCITY и SHAFT_ANGLE"
+96,MULTI_TARGET [w] [FLOAT16]x4,"Текущая уставка. Используется в комбинации с широковещательными пакетами, чтобы выставить уставку на 4 мотора сразу. Содержит 4 числа FLOAT16. Актуальное значение уставки определяется исходя из ID мотора"
+102,SHAFT_FEEDBACK [r] [FLOAT32]x2,"Значения SHAFT_VELOCITY и SHAFT_ANGLE"
 
-127,SAVE_TO_EEPROM [w],"При записи любого значения сохраняет текущие параметры настройки мотора в энергонезависимую память, откуда они будут восстановлены при следующем перезапуске"
+127,SAVE_TO_EEPROM [w] [VOID],"При записи любого значения сохраняет текущие параметры настройки мотора в энергонезависимую память, откуда они будут восстановлены при следующем перезапуске
+NOT IMPLEMENTED"
