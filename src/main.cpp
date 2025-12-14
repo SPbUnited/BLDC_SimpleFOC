@@ -27,7 +27,6 @@ SimpleCan::RxHandler can1RxHandler(8, handleCanMessage);
 FDCAN_TxHeaderTypeDef TxHeader;
 uint8_t TxData[8];
 
-float max_current = 1.0;
 // (Pole_pairs, resistance, kv, inductanse)
 BLDCMotor motor = BLDCMotor(7, 3.6, 82.5, 0.0021);
 uint32_t last_receive_timer = 0;
@@ -61,7 +60,7 @@ void setup()
   // new_sensor.init();
   // power supply voltage [V]
   driver.voltage_power_supply = 24.0;
-  driver.voltage_limit = 8;
+  driver.voltage_limit = driver.voltage_power_supply;
   driver.pwm_frequency = 20000;
   driver.init();
 
@@ -71,31 +70,33 @@ void setup()
   current_sense.skip_align = true;
   current_sense.linkDriver(&driver);
   motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
-  motor.torque_controller = TorqueControlType::foc_current;
+  motor.torque_controller = TorqueControlType::dc_current;
   motor.monitor_variables = _MON_CURR_D | _MON_CURR_Q;
   motor.monitor_variables = _MON_VEL;
   motor.monitor_downsample = 300;
   // motor.LPF_current_d.Tf = 0.01;
   // motor.LPF_current_q.Tf = 0.01;
   // motor.voltage_limit = 4;   // [V]
-  motor.current_limit = max_current;
-  motor.velocity_limit = 10000; // [rad/s]
-  motor.PID_velocity.P = 5;
-  motor.PID_velocity.I = 2;
-  motor.PID_velocity.D = 0.35; // 0.0035
+  motor.current_limit = 1.0; // [A]
+  motor.velocity_limit = 1000; // [rad/s]
+  motor.PID_velocity.P = 0.2;
+  motor.PID_velocity.I = 1.0;
+  motor.PID_velocity.D = 0.0; // 0.0035
+  motor.LPF_velocity.Tf = 0.002;
 
   motor.PID_current_d.P = 3;
-  motor.PID_current_d.I = 150;
+  motor.PID_current_d.I = 1000;
   motor.PID_current_d.D = 0;
-  motor.LPF_current_d = 0.002f;
+  motor.PID_current_d.limit = driver.voltage_power_supply;
+  motor.LPF_current_d = 0.001f;
 
   motor.PID_current_q.P = 3;
-  motor.PID_current_q.I = 150;
+  motor.PID_current_q.I = 1000;
   motor.PID_current_q.D = 0;
-  motor.LPF_current_q = 0.002f;
+  motor.PID_current_q.limit = driver.voltage_power_supply;
+  motor.LPF_current_q = 0.001f;
 
   motor.controller = MotionControlType::velocity;
-  motor.LPF_velocity = 0.3;
   motor.linkSensor(&new_sensor);
   motor.linkCurrentSense(&current_sense);
   motor.sensor_direction = Direction::CW;
@@ -254,11 +255,22 @@ uint32_t save_com = 0;
 float test_float = 0;
 double b14 = 0, a0 = 0, a4 = 0;
 bool error = false;
+
+uint32_t last_time = 0;
+uint32_t dt = 0;
+
+float motor_temp = 0;
+
 void loop()
 {
+  dt = micros() - last_time;
+  last_time = micros();
+
+  motor_temp = get_pcm_temp();
+
   if (motor_id != 0)
   {
-    if (get_motor_temp() < 50.0)
+    if (motor_temp < 50.0)
     {
       motor.loopFOC();
       motor.move();
