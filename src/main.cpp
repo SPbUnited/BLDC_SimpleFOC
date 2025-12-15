@@ -77,7 +77,7 @@ void setup()
   // motor.LPF_current_d.Tf = 0.01;
   // motor.LPF_current_q.Tf = 0.01;
   // motor.voltage_limit = 4;   // [V]
-  motor.current_limit = 1.0; // [A]
+  motor.current_limit = 1.0;   // [A]
   motor.velocity_limit = 1000; // [rad/s]
   motor.PID_velocity.P = 0.2;
   motor.PID_velocity.I = 1.0;
@@ -270,7 +270,7 @@ void loop()
 
   if (motor_id != 0)
   {
-    if (motor_temp < 50.0)
+    if (motor_temp < 70.0)
     {
       motor.loopFOC();
       motor.move();
