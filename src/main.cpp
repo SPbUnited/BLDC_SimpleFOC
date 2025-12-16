@@ -42,7 +42,7 @@ void setup()
   // driver config
   // power supply voltage [V]
   driver.voltage_power_supply = 24.0;
-  driver.voltage_limit = 3.0;
+  driver.voltage_limit = 8.0;
   driver.pwm_frequency = 14000;
   driver.init();
 
