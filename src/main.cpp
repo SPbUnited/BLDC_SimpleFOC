@@ -11,7 +11,7 @@ uint8_t TxData[8];
 
 #include "encoders/MXLEMMING_observer/MXLEMMINGObserverSensor.h"
 
-float max_current = 2.0;
+float max_current = 1.0;
 // (Pole_pairs, resistance, kv, inductanse)
 BLDCMotor motor = BLDCMotor(1, 0.94, 770, 0.104 * 0.001);
 uint32_t last_receive_timer = 0;
@@ -42,7 +42,7 @@ void setup()
   // driver config
   // power supply voltage [V]
   driver.voltage_power_supply = 24.0;
-  driver.voltage_limit = 12.0;
+  driver.voltage_limit = 3.0;
   driver.pwm_frequency = 14000;
   driver.init();
 
@@ -59,7 +59,7 @@ void setup()
   motor.current_limit = max_current;
   motor.velocity_limit = 10000; // [rad/s]
   // default P=0.5 I = 10 D = 0
-  motor.PID_velocity.P = 1.5;
+  motor.PID_velocity.P = 0.5;
   motor.PID_velocity.I = 0.1;
   motor.PID_velocity.D = 0; // 0.001;//0.0035; //0.0035
 
@@ -144,7 +144,11 @@ static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
   // if (rxHeader.Identifier == 0x40)
   // {
   // digitalToggle(PB13);
-  if ((rxHeader.Identifier >> 8) == motor_id || (rxHeader.Identifier >> 8) == 0)
+  // if (rxHeader.Identifier == 0x70A)
+  // {
+
+  // }
+  if ((rxHeader.Identifier >> 8) == motor_id)
   {
     // digitalToggle(PB13);
     color += 1;
@@ -291,7 +295,6 @@ void loop()
     {
       test_flag = 0;
     }
-    
   }
 
   //   // motor.PID_velocity.output_ramp = 1000;
