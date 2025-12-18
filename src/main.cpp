@@ -11,7 +11,7 @@ uint8_t TxData[8];
 
 #include "encoders/MXLEMMING_observer/MXLEMMINGObserverSensor.h"
 
-float max_current = 1.0;
+float max_current = 2.0;
 // (Pole_pairs, resistance, kv, inductanse)
 BLDCMotor motor = BLDCMotor(1, 0.94, 770, 0.104 * 0.001);
 uint32_t last_receive_timer = 0;
@@ -50,7 +50,7 @@ void setup()
   current_sense.skip_align = true;
   current_sense.linkDriver(&driver);
   motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
-  motor.torque_controller = TorqueControlType::foc_current;
+  motor.torque_controller = TorqueControlType::voltage;
   motor.monitor_variables = _MON_TARGET | _MON_ANGLE | _MON_VEL;
   motor.monitor_downsample = 300;
   // motor.LPF_current_d.Tf = 0.01;
@@ -59,8 +59,8 @@ void setup()
   motor.current_limit = max_current;
   motor.velocity_limit = 10000; // [rad/s]
   // default P=0.5 I = 10 D = 0
-  motor.PID_velocity.P = 0.5;
-  motor.PID_velocity.I = 0.1;
+  motor.PID_velocity.P = 0.01;
+  motor.PID_velocity.I = 0.01;
   motor.PID_velocity.D = 0; // 0.001;//0.0035; //0.0035
 
   motor.PID_current_d.P = 0.7; // 2.75;
@@ -74,7 +74,7 @@ void setup()
   motor.LPF_current_q = 0.002f;
 
   motor.controller = MotionControlType::velocity;
-  motor.LPF_velocity = 0.05;
+  motor.LPF_velocity = 0.02;
   // motor.PID_velocity.output_ramp = 1000;
   motor.motion_downsample = 0;
   // init motor hardware
