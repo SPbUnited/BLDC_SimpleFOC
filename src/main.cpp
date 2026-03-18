@@ -82,11 +82,7 @@ void loop()
         {
             static bool was_warning = false;
 
-            if (!was_warning)
-            {
-                was_warning = true;
-                hw::reinit();
-            }
+            hw::reinit();
 
             hw::foc_loop();
             led::set_blink_led(led::GREEN, led::YELLOW, 1000 * current_warnings, 0.5);

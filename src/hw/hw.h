@@ -18,6 +18,9 @@ extern int numMotorsUsed;
 #define WARNING_MOTOR_TEMP 65.0f
 #define WARNING_PCB_TEMP 65.0f
 
+#define NORMAL_CURRENT_LIMIT 4.0
+#define WARNING_CURRENT_LIMIT 1.0
+
 const PinMap PinMap_SPI_MOSI[] = {
     {PB_5, SPI3, STM_PIN_DATA(STM_MODE_AF_PP, GPIO_PULLUP, GPIO_AF6_SPI3)},
 };
@@ -68,7 +71,7 @@ void init(bool is_warning = false)
     motor.linkSensor(&hall_encoder);
     motor.linkCurrentSense(&current_sense);
     motor.sensor_direction = Direction::CW;
-    motor.zero_electric_angle = 2.41141844;
+    motor.voltage_sensor_align = 6.0;
 
     motor.init();
     current_sense.init();
@@ -97,8 +100,8 @@ void init(bool is_warning = false)
     motor.velocity_limit = 1000;  // [rad/s]
     motor.PID_velocity.P = Kp;
     motor.PID_velocity.I = Ki;
-    motor.PID_velocity.D = 0.0;                         // 0.0035
-    motor.PID_velocity.limit = is_warning ? 1.0 : 4.0;  // [A]
+    motor.PID_velocity.D = 0.0;  // 0.0035
+    motor.PID_velocity.limit = is_warning ? WARNING_CURRENT_LIMIT : NORMAL_CURRENT_LIMIT;  // [A]
     motor.LPF_velocity.Tf = Tf;
 
     // motor.PID_current_d.P = 3;
@@ -124,7 +127,7 @@ void reinit()
     // driver.init();
     // motor.init();
     // motor.initFOC();
-    motor.PID_velocity.limit = 1.0;
+    motor.PID_velocity.limit = WARNING_CURRENT_LIMIT;
 }
 
 double get_motor_temp()
