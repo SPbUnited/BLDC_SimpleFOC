@@ -78,7 +78,7 @@ void loop()
             hw::foc_loop();
             led::set_blink_led(led::GREEN, led::OFF, 2500, 1 - 0.025);
         }
-        else if (current_warnings != error::NONE)
+        else if (current_warnings != error::NONE && current_errors == error::NONE)
         {
             static bool was_warning = false;
 
