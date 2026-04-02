@@ -18,7 +18,7 @@ extern int numMotorsUsed;
 #define WARNING_MOTOR_TEMP 65.0f
 #define WARNING_PCB_TEMP 65.0f
 
-#define NORMAL_CURRENT_LIMIT 4.0
+#define NORMAL_CURRENT_LIMIT 6.0
 #define WARNING_CURRENT_LIMIT 1.0
 
 const PinMap PinMap_SPI_MOSI[] = {
