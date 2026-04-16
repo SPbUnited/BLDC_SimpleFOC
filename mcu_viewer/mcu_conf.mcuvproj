@@ -1,0 +1,1445 @@
+[elf]
+file_path = ../.pio/build/disco_b_g431b_esc1/firmware.elf
+relative_path = true
+
+[general]
+version = 2
+
+[settings]
+sample_frequency_hz = 100
+max_points = 10000
+max_viewport_points = 5000
+viewport_width_ms = 5000.000000
+refresh_on_elf_change = true
+stop_acq_on_elf_change = true
+probe_type = 0
+target_name = 
+probe_mode = 0
+probe_speed_khz = 20000
+probe_sn = 190017000C0000545448534E
+should_log = false
+log_directory = 
+gdb_command = gdb
+recorder_enabled = false
+restart_on_group_change = true
+keep_connection = true
+ip_address = 127.0.0.1
+port = 3333
+
+[trace_settings]
+core_frequency = 160000
+trace_prescaler = 10
+max_points = 10000
+max_viewport_points_percent = 10
+viewport_width_ms = 5.000000
+trigger_channel = -1
+trigger_level = 0.900000
+timeout = 2
+probe_type = 0
+target_name = 
+probe_speed_khz = 10000
+probe_sn = 
+should_log = false
+log_directory = 
+
+[var0]
+name = adcBuffer1[0]
+tracked_name = adcBuffer1[0]
+address = 536872124
+type = 3
+color = 2923030772
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var1]
+name = adcBuffer1[1]
+tracked_name = adcBuffer1[1]
+address = 536872126
+type = 3
+color = 3371181327
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var2]
+name = adcBuffer1[2]
+tracked_name = adcBuffer1[2]
+address = 536872128
+type = 3
+color = 3423153635
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var3]
+name = adcBuffer1[3]
+tracked_name = adcBuffer1[3]
+address = 536872130
+type = 3
+color = 1852714572
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var4]
+name = adcBuffer2[0]
+tracked_name = adcBuffer2[0]
+address = 536872120
+type = 3
+color = 3607838259
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var5]
+name = adcBuffer2[1]
+tracked_name = adcBuffer2[1]
+address = 536872122
+type = 3
+color = 1047345604
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var6]
+name = adcBuffer2[2]
+tracked_name = adcBuffer2[2]
+address = 536872124
+type = 3
+color = 4847283
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var7]
+name = buf[0]
+tracked_name = buf[0]
+address = 536872872
+type = 2
+color = 889915811
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var8]
+name = counter
+tracked_name = counter
+address = 536872440
+type = 6
+color = 1084140788
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var9]
+name = current_errors
+tracked_name = current_errors
+address = 536872941
+type = 1
+color = 3686008681
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var10]
+name = current_sense_align_status
+tracked_name = current_sense_align_status
+address = 536872128
+type = 6
+color = 2204883914
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var11]
+name = current_warnings
+tracked_name = current_warnings
+address = 536872940
+type = 1
+color = 2224019002
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var12]
+name = currents.a
+tracked_name = currents.a
+address = 536872132
+type = 7
+color = 2884668246
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var13]
+name = currents.b
+tracked_name = currents.b
+address = 536872136
+type = 7
+color = 2472959705
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var14]
+name = currents.c
+tracked_name = currents.c
+address = 536872140
+type = 7
+color = 59731853
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var15]
+name = dt
+tracked_name = dt
+address = 536872932
+type = 5
+color = 2397065989
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var16]
+name = hw::motor.LPF_angle.Tf
+tracked_name = hw::motor.LPF_angle.Tf
+address = 536873636
+type = 7
+color = 4083244962
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var17]
+name = hw::motor.LPF_current_d.Tf
+tracked_name = hw::motor.LPF_current_d.Tf
+address = 536873524
+type = 7
+color = 2674477502
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.004000
+do_not_interpret_as_enum = false
+
+[var18]
+name = hw::motor.LPF_current_q.Tf
+tracked_name = hw::motor.LPF_current_q.Tf
+address = 536873508
+type = 7
+color = 502057909
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.001000
+do_not_interpret_as_enum = false
+
+[var19]
+name = hw::motor.LPF_velocity.Tf
+tracked_name = hw::motor.LPF_velocity.Tf
+address = 536873620
+type = 7
+color = 2244273423
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.020000
+do_not_interpret_as_enum = false
+
+[var20]
+name = hw::motor.PID_current_d.D
+tracked_name = hw::motor.PID_current_d.D
+address = 536873476
+type = 7
+color = 3460758172
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var21]
+name = hw::motor.PID_current_d.I
+tracked_name = hw::motor.PID_current_d.I
+address = 536873472
+type = 7
+color = 3946080528
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 300.000000
+do_not_interpret_as_enum = false
+
+[var22]
+name = hw::motor.PID_current_d.P
+tracked_name = hw::motor.PID_current_d.P
+address = 536873468
+type = 7
+color = 3944961321
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 3.000000
+do_not_interpret_as_enum = false
+
+[var23]
+name = hw::motor.PID_current_d.limit
+tracked_name = hw::motor.PID_current_d.limit
+address = 536873484
+type = 7
+color = 3253574487
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 25.000000
+do_not_interpret_as_enum = false
+
+[var24]
+name = hw::motor.PID_current_d.output_ramp
+tracked_name = hw::motor.PID_current_d.output_ramp
+address = 536873480
+type = 7
+color = 2365791414
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var25]
+name = hw::motor.PID_current_q.D
+tracked_name = hw::motor.PID_current_q.D
+address = 536873436
+type = 7
+color = 2861041673
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var26]
+name = hw::motor.PID_current_q.I
+tracked_name = hw::motor.PID_current_q.I
+address = 536873432
+type = 7
+color = 1170477214
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 100.000000
+do_not_interpret_as_enum = false
+
+[var27]
+name = hw::motor.PID_current_q.P
+tracked_name = hw::motor.PID_current_q.P
+address = 536873428
+type = 7
+color = 2841434144
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 3.000000
+do_not_interpret_as_enum = false
+
+[var28]
+name = hw::motor.PID_current_q.limit
+tracked_name = hw::motor.PID_current_q.limit
+address = 536873444
+type = 7
+color = 921016599
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 25.000000
+do_not_interpret_as_enum = false
+
+[var29]
+name = hw::motor.PID_current_q.output_ramp
+tracked_name = hw::motor.PID_current_q.output_ramp
+address = 536873440
+type = 7
+color = 1693769869
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var30]
+name = hw::motor.PID_velocity.D
+tracked_name = hw::motor.PID_velocity.D
+address = 536873548
+type = 7
+color = 2125134864
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var31]
+name = hw::motor.PID_velocity.I
+tracked_name = hw::motor.PID_velocity.I
+address = 536873544
+type = 7
+color = 4255317449
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.800000
+do_not_interpret_as_enum = false
+
+[var32]
+name = hw::motor.PID_velocity.P
+tracked_name = hw::motor.PID_velocity.P
+address = 536873540
+type = 7
+color = 2033922642
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.080000
+do_not_interpret_as_enum = false
+
+[var33]
+name = hw::motor.PID_velocity.limit
+tracked_name = hw::motor.PID_velocity.limit
+address = 536873556
+type = 7
+color = 3399476679
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 4.000000
+do_not_interpret_as_enum = false
+
+[var34]
+name = hw::motor.PID_velocity.output_ramp
+tracked_name = hw::motor.PID_velocity.output_ramp
+address = 536873552
+type = 7
+color = 2104279999
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var35]
+name = hw::motor.P_angle.P
+tracked_name = hw::motor.P_angle.P
+address = 536873580
+type = 7
+color = 3392112070
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 10.000000
+do_not_interpret_as_enum = false
+
+[var36]
+name = hw::motor.P_angle.limit
+tracked_name = hw::motor.P_angle.limit
+address = 536873596
+type = 7
+color = 3163585706
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 20.000000
+do_not_interpret_as_enum = false
+
+[var37]
+name = hw::motor.Ua
+tracked_name = hw::motor.Ua
+address = 536873736
+type = 7
+color = 972506602
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var38]
+name = hw::motor.Ub
+tracked_name = hw::motor.Ub
+address = 536873740
+type = 7
+color = 913538114
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var39]
+name = hw::motor.Uc
+tracked_name = hw::motor.Uc
+address = 536873744
+type = 7
+color = 3041023294
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var40]
+name = hw::motor.controller
+tracked_name = hw::motor.controller
+address = 536873425
+type = 1
+color = 1737207903
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 3
+value_to_write = 1.000000
+do_not_interpret_as_enum = false
+
+[var41]
+name = hw::motor.current.d
+tracked_name = hw::motor.current.d
+address = 536873340
+type = 7
+color = 2991077560
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var42]
+name = hw::motor.current.q
+tracked_name = hw::motor.current.q
+address = 536873344
+type = 7
+color = 1347019308
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var43]
+name = hw::motor.current_limit
+tracked_name = hw::motor.current_limit
+address = 536873412
+type = 7
+color = 1001311180
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 1.000000
+do_not_interpret_as_enum = false
+
+[var44]
+name = hw::motor.current_sp
+tracked_name = hw::motor.current_sp
+address = 536873320
+type = 7
+color = 488664892
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var45]
+name = hw::motor.electrical_angle
+tracked_name = hw::motor.electrical_angle
+address = 536873312
+type = 7
+color = 2531145645
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var46]
+name = hw::motor.modulation_centered
+tracked_name = hw::motor.modulation_centered
+address = 536873423
+type = 2
+color = 2830262655
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var47]
+name = hw::motor.shaft_angle
+tracked_name = hw::motor.shaft_angle
+address = 536873308
+type = 7
+color = 3796152132
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var48]
+name = hw::motor.shaft_angle_sp
+tracked_name = hw::motor.shaft_angle_sp
+address = 536873328
+type = 7
+color = 3032829716
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var49]
+name = hw::motor.shaft_velocity
+tracked_name = hw::motor.shaft_velocity
+address = 536873316
+type = 7
+color = 3290140337
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var50]
+name = hw::motor.shaft_velocity_sp
+tracked_name = hw::motor.shaft_velocity_sp
+address = 536873324
+type = 7
+color = 3922218902
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var51]
+name = hw::motor.target
+tracked_name = hw::motor.target
+address = 536873300
+type = 7
+color = 3651142666
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 1.000000
+do_not_interpret_as_enum = false
+
+[var52]
+name = hw::motor.torque_controller
+tracked_name = hw::motor.torque_controller
+address = 536873424
+type = 1
+color = 409835532
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 3
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var53]
+name = hw::motor.velocity_limit
+tracked_name = hw::motor.velocity_limit
+address = 536873416
+type = 7
+color = 2381240679
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 10.000000
+do_not_interpret_as_enum = false
+
+[var54]
+name = hw::motor.voltage.d
+tracked_name = hw::motor.voltage.d
+address = 536873332
+type = 7
+color = 2669471743
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var55]
+name = hw::motor.voltage.q
+tracked_name = hw::motor.voltage.q
+address = 536873336
+type = 7
+color = 3444748691
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var56]
+name = hw::motor.voltage_bemf
+tracked_name = hw::motor.voltage_bemf
+address = 536873348
+type = 7
+color = 3077897559
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var57]
+name = hw::motor.voltage_limit
+tracked_name = hw::motor.voltage_limit
+address = 536873408
+type = 7
+color = 3714765922
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 25.000000
+do_not_interpret_as_enum = false
+
+[var58]
+name = last_time
+tracked_name = last_time
+address = 536872936
+type = 5
+color = 2038391624
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var59]
+name = motor_id
+tracked_name = motor_id
+address = 536872942
+type = 1
+color = 1529224208
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var60]
+name = motor_temp
+tracked_name = motor_temp
+address = 536872928
+type = 7
+color = 855234500
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 89.000000
+do_not_interpret_as_enum = false
+
+[var61]
+name = pcb_temp
+tracked_name = pcb_temp
+address = 536872924
+type = 7
+color = 1646729687
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 0.000000
+do_not_interpret_as_enum = false
+
+[var62]
+name = vbus
+tracked_name = vbus
+address = 536871216
+type = 7
+color = 2527629482
+should_update_from_elf = true
+shift = 0
+mask = 4294967295
+high_level_type = 0
+value_to_write = 20.500000
+do_not_interpret_as_enum = false
+
+[group0]
+name = new group0
+acquisition_type = 0
+
+[group0-plot0]
+name = current_sense
+type = 2
+visibility = false
+
+[group0-plot0-series0]
+name = current_sense_align_status
+visibility = true
+format = DEC
+
+[group0-plot0-series1]
+name = currents.a
+visibility = true
+format = DEC
+
+[group0-plot0-series2]
+name = currents.b
+visibility = true
+format = DEC
+
+[group0-plot0-series3]
+name = currents.c
+visibility = true
+format = DEC
+
+[group0-plot1]
+name = currents
+type = 0
+visibility = false
+
+[group0-plot1-series0]
+name = hw::motor.current.d
+visibility = true
+format = DEC
+
+[group0-plot1-series1]
+name = hw::motor.current.q
+visibility = true
+format = DEC
+
+[group0-plot1-series2]
+name = hw::motor.current_sp
+visibility = true
+format = DEC
+
+[group0-plot2]
+name = fvel
+type = 0
+visibility = false
+
+[group0-plot2-series0]
+name = counter
+visibility = true
+format = DEC
+
+[group0-plot3]
+name = pos
+type = 0
+visibility = false
+
+[group0-plot3-series0]
+name = hw::motor.shaft_angle
+visibility = false
+format = DEC
+
+[group0-plot3-series1]
+name = hw::motor.shaft_angle_sp
+visibility = false
+format = DEC
+
+[group0-plot3-series2]
+name = hw::motor.shaft_velocity
+visibility = true
+format = DEC
+
+[group0-plot3-series3]
+name = hw::motor.shaft_velocity_sp
+visibility = true
+format = DEC
+
+[group0-plot4]
+name = settings
+type = 2
+visibility = false
+
+[group0-plot4-series0]
+name = buf[0]
+visibility = true
+format = DEC
+
+[group0-plot4-series1]
+name = current_sense_align_status
+visibility = true
+format = DEC
+
+[group0-plot4-series2]
+name = hw::motor.LPF_current_d.Tf
+visibility = false
+format = DEC
+
+[group0-plot4-series3]
+name = hw::motor.LPF_current_q.Tf
+visibility = true
+format = DEC
+
+[group0-plot4-series4]
+name = hw::motor.PID_current_d.D
+visibility = false
+format = DEC
+
+[group0-plot4-series5]
+name = hw::motor.PID_current_d.I
+visibility = false
+format = DEC
+
+[group0-plot4-series6]
+name = hw::motor.PID_current_d.P
+visibility = false
+format = DEC
+
+[group0-plot4-series7]
+name = hw::motor.PID_current_d.limit
+visibility = false
+format = DEC
+
+[group0-plot4-series8]
+name = hw::motor.PID_current_d.output_ramp
+visibility = false
+format = DEC
+
+[group0-plot4-series9]
+name = hw::motor.PID_current_q.D
+visibility = false
+format = DEC
+
+[group0-plot4-series10]
+name = hw::motor.PID_current_q.I
+visibility = true
+format = DEC
+
+[group0-plot4-series11]
+name = hw::motor.PID_current_q.P
+visibility = true
+format = DEC
+
+[group0-plot4-series12]
+name = hw::motor.PID_current_q.limit
+visibility = true
+format = DEC
+
+[group0-plot4-series13]
+name = hw::motor.PID_current_q.output_ramp
+visibility = false
+format = DEC
+
+[group0-plot4-series14]
+name = hw::motor.current_limit
+visibility = true
+format = DEC
+
+[group0-plot4-series15]
+name = hw::motor.modulation_centered
+visibility = true
+format = DEC
+
+[group0-plot4-series16]
+name = hw::motor.velocity_limit
+visibility = true
+format = DEC
+
+[group0-plot4-series17]
+name = hw::motor.voltage_limit
+visibility = true
+format = DEC
+
+[group0-plot5]
+name = target
+type = 2
+visibility = true
+
+[group0-plot5-series0]
+name = dt
+visibility = true
+format = DEC
+
+[group0-plot5-series1]
+name = hw::motor.controller
+visibility = true
+format = DEC
+
+[group0-plot5-series2]
+name = hw::motor.current_limit
+visibility = true
+format = DEC
+
+[group0-plot5-series3]
+name = hw::motor.target
+visibility = true
+format = DEC
+
+[group0-plot5-series4]
+name = hw::motor.torque_controller
+visibility = true
+format = DEC
+
+[group0-plot5-series5]
+name = hw::motor.velocity_limit
+visibility = true
+format = DEC
+
+[group0-plot5-series6]
+name = hw::motor.voltage_limit
+visibility = true
+format = DEC
+
+[group0-plot6]
+name = temp
+type = 2
+visibility = true
+
+[group0-plot6-series0]
+name = current_errors
+visibility = true
+format = DEC
+
+[group0-plot6-series1]
+name = dt
+visibility = true
+format = DEC
+
+[group0-plot6-series2]
+name = last_time
+visibility = true
+format = DEC
+
+[group0-plot6-series3]
+name = motor_id
+visibility = true
+format = DEC
+
+[group0-plot6-series4]
+name = motor_temp
+visibility = true
+format = DEC
+
+[group0-plot6-series5]
+name = pcb_temp
+visibility = true
+format = DEC
+
+[group0-plot6-series6]
+name = vbus
+visibility = true
+format = DEC
+
+[group0-plot7]
+name = vbus
+type = 0
+visibility = true
+
+[group0-plot7-series0]
+name = vbus
+visibility = true
+format = DEC
+
+[group0-plot8]
+name = vel controller
+type = 2
+visibility = false
+
+[group0-plot8-series0]
+name = hw::motor.LPF_velocity.Tf
+visibility = true
+format = DEC
+
+[group0-plot8-series1]
+name = hw::motor.PID_velocity.D
+visibility = true
+format = DEC
+
+[group0-plot8-series2]
+name = hw::motor.PID_velocity.I
+visibility = true
+format = DEC
+
+[group0-plot8-series3]
+name = hw::motor.PID_velocity.P
+visibility = true
+format = DEC
+
+[group0-plot8-series4]
+name = hw::motor.PID_velocity.limit
+visibility = true
+format = DEC
+
+[group0-plot8-series5]
+name = hw::motor.PID_velocity.output_ramp
+visibility = false
+format = DEC
+
+[group0-plot8-series6]
+name = hw::motor.P_angle.P
+visibility = true
+format = DEC
+
+[group0-plot8-series7]
+name = hw::motor.P_angle.limit
+visibility = true
+format = DEC
+
+[group0-plot8-series8]
+name = hw::motor.velocity_limit
+visibility = true
+format = DEC
+
+[group1]
+name = voltages
+acquisition_type = 0
+
+[group1-plot0]
+name = angles
+type = 0
+visibility = false
+
+[group1-plot0-series0]
+name = hw::motor.electrical_angle
+visibility = true
+format = DEC
+
+[group1-plot0-series1]
+name = hw::motor.shaft_angle
+visibility = true
+format = DEC
+
+[group1-plot1]
+name = currents
+type = 0
+visibility = true
+
+[group1-plot1-series0]
+name = hw::motor.current.d
+visibility = true
+format = DEC
+
+[group1-plot1-series1]
+name = hw::motor.current.q
+visibility = true
+format = DEC
+
+[group1-plot1-series2]
+name = hw::motor.current_sp
+visibility = true
+format = DEC
+
+[group1-plot2]
+name = dma
+type = 2
+visibility = false
+
+[group1-plot2-series0]
+name = adcBuffer1[0]
+visibility = true
+format = DEC
+
+[group1-plot2-series1]
+name = adcBuffer1[1]
+visibility = true
+format = DEC
+
+[group1-plot2-series2]
+name = adcBuffer1[2]
+visibility = true
+format = DEC
+
+[group1-plot2-series3]
+name = adcBuffer1[3]
+visibility = true
+format = DEC
+
+[group1-plot2-series4]
+name = adcBuffer2[0]
+visibility = true
+format = DEC
+
+[group1-plot2-series5]
+name = adcBuffer2[1]
+visibility = true
+format = DEC
+
+[group1-plot2-series6]
+name = adcBuffer2[2]
+visibility = true
+format = DEC
+
+[group1-plot3]
+name = pos
+type = 0
+visibility = true
+
+[group1-plot3-series0]
+name = hw::motor.shaft_angle
+visibility = false
+format = DEC
+
+[group1-plot3-series1]
+name = hw::motor.shaft_angle_sp
+visibility = false
+format = DEC
+
+[group1-plot3-series2]
+name = hw::motor.shaft_velocity
+visibility = true
+format = DEC
+
+[group1-plot3-series3]
+name = hw::motor.shaft_velocity_sp
+visibility = true
+format = DEC
+
+[group1-plot4]
+name = target
+type = 2
+visibility = true
+
+[group1-plot4-series0]
+name = current_errors
+visibility = true
+format = DEC
+
+[group1-plot4-series1]
+name = current_warnings
+visibility = true
+format = DEC
+
+[group1-plot4-series2]
+name = dt
+visibility = true
+format = DEC
+
+[group1-plot4-series3]
+name = hw::motor.PID_velocity.limit
+visibility = true
+format = DEC
+
+[group1-plot4-series4]
+name = hw::motor.controller
+visibility = true
+format = DEC
+
+[group1-plot4-series5]
+name = hw::motor.current_limit
+visibility = true
+format = DEC
+
+[group1-plot4-series6]
+name = hw::motor.target
+visibility = true
+format = DEC
+
+[group1-plot4-series7]
+name = hw::motor.torque_controller
+visibility = true
+format = DEC
+
+[group1-plot4-series8]
+name = hw::motor.velocity_limit
+visibility = true
+format = DEC
+
+[group1-plot4-series9]
+name = hw::motor.voltage_limit
+visibility = true
+format = DEC
+
+[group1-plot4-series10]
+name = motor_temp
+visibility = true
+format = DEC
+
+[group1-plot4-series11]
+name = pcb_temp
+visibility = true
+format = DEC
+
+[group1-plot4-series12]
+name = vbus
+visibility = true
+format = DEC
+
+[group1-plot5]
+name = voltages
+type = 0
+visibility = true
+
+[group1-plot5-series0]
+name = hw::motor.Ua
+visibility = true
+format = DEC
+
+[group1-plot5-series1]
+name = hw::motor.Ub
+visibility = true
+format = DEC
+
+[group1-plot5-series2]
+name = hw::motor.Uc
+visibility = true
+format = DEC
+
+[group1-plot5-series3]
+name = hw::motor.voltage.d
+visibility = true
+format = DEC
+
+[group1-plot5-series4]
+name = hw::motor.voltage.q
+visibility = true
+format = DEC
+
+[trace_plot0]
+name = CH0
+alias = CH0
+visibility = true
+domain = 1
+
+[trace_plot1]
+name = CH1
+alias = CH1
+visibility = true
+domain = 1
+
+[trace_plot2]
+name = CH2
+alias = CH2
+visibility = true
+domain = 1
+
+[trace_plot3]
+name = CH3
+alias = CH3
+visibility = true
+domain = 1
+
+[trace_plot4]
+name = CH4
+alias = CH4
+visibility = true
+domain = 1
+
+[trace_plot5]
+name = CH5
+alias = CH5
+visibility = true
+domain = 1
+
+[trace_plot6]
+name = CH6
+alias = CH6
+visibility = true
+domain = 1
+
+[trace_plot7]
+name = CH7
+alias = CH7
+visibility = true
+domain = 1
+
+[trace_plot8]
+name = CH8
+alias = CH8
+visibility = true
+domain = 1
+
+[trace_plot9]
+name = CH9
+alias = CH9
+visibility = true
+domain = 1

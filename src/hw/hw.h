@@ -21,6 +21,9 @@ extern int numMotorsUsed;
 #define NORMAL_CURRENT_LIMIT 6.0
 #define WARNING_CURRENT_LIMIT 1.0
 
+#define VBUS_WARNING_UNDERVOLT 21.0f
+#define VBUS_ERROR_UNDERVOLT 20.0f
+
 const PinMap PinMap_SPI_MOSI[] = {
     {PB_5, SPI3, STM_PIN_DATA(STM_MODE_AF_PP, GPIO_PULLUP, GPIO_AF6_SPI3)},
 };
@@ -199,6 +202,16 @@ bool is_pcb_temp_warning(float temp)
 bool is_motor_temp_warning(float temp)
 {
     return temp > WARNING_MOTOR_TEMP;
+}
+
+bool is_vbus_undervolt_warning(float vbus)
+{
+    return vbus < VBUS_WARNING_UNDERVOLT;
+}
+
+bool is_vbus_undervolt_error(float vbus)
+{
+    return vbus < VBUS_ERROR_UNDERVOLT;
 }
 
 };  // namespace hw

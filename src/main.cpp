@@ -44,7 +44,9 @@ uint32_t dt = 0;
 
 float motor_temp = 0;
 float pcb_temp = 0;
-float vbus = 0;
+float vbus = 24.0;
+
+float vbus_filter_alpha = 0.0001;
 
 void loop()
 {
@@ -53,7 +55,7 @@ void loop()
 
     motor_temp = hw::get_motor_temp();
     pcb_temp = hw::get_pcb_temp();
-    vbus = hw::get_vbus();
+    vbus = vbus_filter_alpha * hw::get_vbus() + (1.0 - vbus_filter_alpha) * vbus;
 
     if (motor_id != 0)
     {
@@ -68,10 +70,13 @@ void loop()
                               : error::NONE;
         current_errors |= !hw::is_pcb_temp_ok(pcb_temp) ? error::PCB_TEMP : error::NONE;
         current_errors |= !hw::is_motor_temp_ok(motor_temp) ? error::MOTOR_TEMP : error::NONE;
+        current_errors |= hw::is_vbus_undervolt_error(vbus) ? error::VBUS_UNDERVOLT : error::NONE;
 
         current_warnings |= hw::is_pcb_temp_warning(pcb_temp) ? error::PCB_TEMP : error::NONE;
         current_warnings |=
             hw::is_motor_temp_warning(motor_temp) ? error::MOTOR_TEMP : error::NONE;
+        current_warnings |=
+            hw::is_vbus_undervolt_warning(vbus) ? error::VBUS_UNDERVOLT : error::NONE;
 
         if (current_errors == error::NONE && current_warnings == error::NONE)
         {

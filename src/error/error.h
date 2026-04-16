@@ -11,6 +11,7 @@ enum ERRORS
     MOTOR_INIT_FAILED = 0b100,
     MOTOR_CALIB_FAILED = 0b1000,
     MOTOR_ERROR = 0b10000,
+    VBUS_UNDERVOLT = 0b100000,
 };
 
 }  // namespace error
