@@ -18,7 +18,7 @@ extern int numMotorsUsed;
 #define WARNING_MOTOR_TEMP 65.0f
 #define WARNING_PCB_TEMP 65.0f
 
-#define NORMAL_CURRENT_LIMIT 6.0
+#define NORMAL_CURRENT_LIMIT 12.0
 #define WARNING_CURRENT_LIMIT 1.0
 
 #define VBUS_WARNING_UNDERVOLT 21.0f
@@ -96,8 +96,10 @@ void init(bool is_warning = false)
     float constexpr Tu = 0.05;
     float constexpr Tm = 0.02;
     float constexpr B = 2;
-    float constexpr Kp = 0.1;
-    float constexpr Ki = Kp / Tm;
+    // float constexpr Kp = 0.1;
+    // float constexpr Ki = Kp / Tm;
+    float constexpr Kp = 0.25;
+    float constexpr Ki = 40.0;
 
     motor.current_limit = 1.0;    // [A]
     motor.velocity_limit = 1000;  // [rad/s]

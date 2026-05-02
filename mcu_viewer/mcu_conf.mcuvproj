@@ -481,7 +481,7 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 4.000000
+value_to_write = 8.000000
 do_not_interpret_as_enum = false
 
 [var34]
@@ -715,7 +715,7 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 1.000000
+value_to_write = 150.000000
 do_not_interpret_as_enum = false
 
 [var52]
@@ -858,7 +858,7 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 20.500000
+value_to_write = 19.500000
 do_not_interpret_as_enum = false
 
 [group0]
@@ -893,7 +893,7 @@ format = DEC
 [group0-plot1]
 name = currents
 type = 0
-visibility = false
+visibility = true
 
 [group0-plot1-series0]
 name = hw::motor.current.d
@@ -923,7 +923,7 @@ format = DEC
 [group0-plot3]
 name = pos
 type = 0
-visibility = false
+visibility = true
 
 [group0-plot3-series0]
 name = hw::motor.shaft_angle
@@ -1123,7 +1123,7 @@ format = DEC
 [group0-plot7]
 name = vbus
 type = 0
-visibility = true
+visibility = false
 
 [group0-plot7-series0]
 name = vbus
@@ -1133,7 +1133,7 @@ format = DEC
 [group0-plot8]
 name = vel controller
 type = 2
-visibility = false
+visibility = true
 
 [group0-plot8-series0]
 name = hw::motor.LPF_velocity.Tf

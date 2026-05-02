@@ -26,7 +26,9 @@
  */
 
 #include <SimpleFOC.h>
+
 #include <map>
+
 #include "half_float.h"
 
 enum CANFuocoRegisterMap
@@ -118,7 +120,7 @@ enum CANFuocoRegisterMap
 
 struct CANFuocoMotorConfig
 {
-    uint8_t& motor_id;
+    uint8_t &motor_id;
     float get_supply_voltage(void);
     BLDCMotor &motor;
     float speed = 0;
@@ -131,20 +133,19 @@ struct CANFuocoMonitorSettings
 
 class CANFuoco : public CANFuocoMotorConfig
 {
-private:
+  private:
     CANFuocoMonitorSettings monitor_settings;
 
     std::map<CANFuocoRegisterMap, uint8_t *> CANFuocoRegisterMapNames;
 
-public:
+  public:
     CANFuoco(CANFuocoMotorConfig &motor_config);
 
     void can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf);
     bool can_tx_callback(uint8_t *buf);
 };
 
-CANFuoco::CANFuoco(
-    CANFuocoMotorConfig &motor_config) : CANFuocoMotorConfig(motor_config)
+CANFuoco::CANFuoco(CANFuocoMotorConfig &motor_config) : CANFuocoMotorConfig(motor_config)
 {
     CANFuocoRegisterMapNames = std::map<CANFuocoRegisterMap, uint8_t *>{
         {TARGET_RW, reinterpret_cast<uint8_t *>(&motor.target)},
@@ -180,19 +181,22 @@ CANFuoco::CANFuoco(
         {PID_CURRENT_D_P_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.P)},
         {PID_CURRENT_D_I_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.I)},
         {PID_CURRENT_D_D_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.D)},
-        {PID_CURREND_D_OUTPUT_RAMP_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.output_ramp)},
+        {PID_CURREND_D_OUTPUT_RAMP_RW,
+         reinterpret_cast<uint8_t *>(&motor.PID_current_d.output_ramp)},
         {PID_CURRENT_D_LIMIT_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.limit)},
         {LPF_CURRENT_D_TF_RW, reinterpret_cast<uint8_t *>(&motor.LPF_current_d.Tf)},
         {PID_CURRENT_Q_P_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.P)},
         {PID_CURRENT_Q_I_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.I)},
         {PID_CURRENT_Q_D_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.D)},
-        {PID_CURRENT_Q_OUTPUT_RAMP_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.output_ramp)},
+        {PID_CURRENT_Q_OUTPUT_RAMP_RW,
+         reinterpret_cast<uint8_t *>(&motor.PID_current_q.output_ramp)},
         {PID_CURRENT_Q_LIMIT_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.limit)},
         {LPF_CURRENT_Q_TF_RW, reinterpret_cast<uint8_t *>(&motor.LPF_current_q.Tf)},
         {PID_VELOCITY_P_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.P)},
         {PID_VELOCITY_I_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.I)},
         {PID_VELOCITY_D_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.D)},
-        {PID_VELOCITY_OUTPUT_RAMP_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.output_ramp)},
+        {PID_VELOCITY_OUTPUT_RAMP_RW,
+         reinterpret_cast<uint8_t *>(&motor.PID_velocity.output_ramp)},
         {PID_VELOCITY_LIMIT_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.limit)},
         {LPF_VELOCITY_TF_RW, reinterpret_cast<uint8_t *>(&motor.LPF_velocity.Tf)},
         {P_ANGLE_P_RW, reinterpret_cast<uint8_t *>(&motor.P_angle.P)},
@@ -212,76 +216,75 @@ void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
     CANFuocoRegisterMap id = static_cast<CANFuocoRegisterMap>(m_id);
     switch (id)
     {
-    default:
-    case EMERGENCY_STOP_W:
-        motor.disable();
-        delay(15000);
-        break;
+        default:
+        case EMERGENCY_STOP_W:
+            motor.disable();
+            delay(15000);
+            break;
 
-    case MONITOR_SETTINGS_RW:
-        memcpy(&monitor_settings, buf, len);
-        break;
+        case MONITOR_SETTINGS_RW:
+            memcpy(&monitor_settings, buf, len);
+            break;
 
-    case TARGET_RW:
-    case VOLTAGE_SENSOR_ALIGN_RW:
-    case VELOCITY_INDEX_SEARCH_RW:
-    case PHASE_RESISTANCE_RW:
-    case POLE_PAIRS_RW:
-    case KV_RATING_RW:
-    case PHASE_INDUCTANCE_RW:
-    case VOLTAGE_LIMIT_RW:
-    case CURRENT_LIMIT_RW:
-    case VELOCITY_LIMIT_RW:
-    case ENABLED_RW:
-    case FOC_MODULATION_RW:
-    case MODULATION_CENTERED_RW:
-    case TORQUE_CONTROLLER_RW:
-    case CONTROLLER_RW:
-    case PID_CURRENT_D_P_RW:
-    case PID_CURRENT_D_I_RW:
-    case PID_CURRENT_D_D_RW:
-    case PID_CURREND_D_OUTPUT_RAMP_RW:
-    case PID_CURRENT_D_LIMIT_RW:
-    case LPF_CURRENT_D_TF_RW:
-    case PID_CURRENT_Q_P_RW:
-    case PID_CURRENT_Q_I_RW:
-    case PID_CURRENT_Q_D_RW:
-    case PID_CURRENT_Q_OUTPUT_RAMP_RW:
-    case PID_CURRENT_Q_LIMIT_RW:
-    case LPF_CURRENT_Q_TF_RW:
-    case PID_VELOCITY_P_RW:
-    case PID_VELOCITY_I_RW:
-    case PID_VELOCITY_D_RW:    
-    case PID_VELOCITY_OUTPUT_RAMP_RW:
-    case PID_VELOCITY_LIMIT_RW:
-    case LPF_VELOCITY_TF_RW:
-    case P_ANGLE_P_RW:
-    case P_ANGLE_LIMIT_RW:
-    case LPF_ANGLE_TF_RW:
-    case MOTION_DOWNSAMPLE_RW:
-    case MOTION_CNT_RW:
-    case SENSOR_OFFSET_RW:
-    case ZERO_ELECTRIC_ANGLE_RW:
-    case SENSOR_DIRECTION_RW:
-    case PP_CHECK_RESULT_RW:
-        memcpy(CANFuocoRegisterMapNames.at(id), buf, len);
-        break;
+        case TARGET_RW:
+        case VOLTAGE_SENSOR_ALIGN_RW:
+        case VELOCITY_INDEX_SEARCH_RW:
+        case PHASE_RESISTANCE_RW:
+        case POLE_PAIRS_RW:
+        case KV_RATING_RW:
+        case PHASE_INDUCTANCE_RW:
+        case VOLTAGE_LIMIT_RW:
+        case CURRENT_LIMIT_RW:
+        case VELOCITY_LIMIT_RW:
+        case ENABLED_RW:
+        case FOC_MODULATION_RW:
+        case MODULATION_CENTERED_RW:
+        case TORQUE_CONTROLLER_RW:
+        case CONTROLLER_RW:
+        case PID_CURRENT_D_P_RW:
+        case PID_CURRENT_D_I_RW:
+        case PID_CURRENT_D_D_RW:
+        case PID_CURREND_D_OUTPUT_RAMP_RW:
+        case PID_CURRENT_D_LIMIT_RW:
+        case LPF_CURRENT_D_TF_RW:
+        case PID_CURRENT_Q_P_RW:
+        case PID_CURRENT_Q_I_RW:
+        case PID_CURRENT_Q_D_RW:
+        case PID_CURRENT_Q_OUTPUT_RAMP_RW:
+        case PID_CURRENT_Q_LIMIT_RW:
+        case LPF_CURRENT_Q_TF_RW:
+        case PID_VELOCITY_P_RW:
+        case PID_VELOCITY_I_RW:
+        case PID_VELOCITY_D_RW:
+        case PID_VELOCITY_OUTPUT_RAMP_RW:
+        case PID_VELOCITY_LIMIT_RW:
+        case LPF_VELOCITY_TF_RW:
+        case P_ANGLE_P_RW:
+        case P_ANGLE_LIMIT_RW:
+        case LPF_ANGLE_TF_RW:
+        case MOTION_DOWNSAMPLE_RW:
+        case MOTION_CNT_RW:
+        case SENSOR_OFFSET_RW:
+        case ZERO_ELECTRIC_ANGLE_RW:
+        case SENSOR_DIRECTION_RW:
+        case PP_CHECK_RESULT_RW:
+            memcpy(CANFuocoRegisterMapNames.at(id), buf, len);
+            break;
 
-    case MULTI_TARGET_W:
-        if (1 <= motor_id && motor_id < 5)
-        {
-            ushort *target_data = reinterpret_cast<ushort *>(buf);
-            speed = half_to_float(target_data[motor_id - 1]);
-            motor.target = speed;
-            // motor.move(half_to_float(target_data[motor_id - 1]));
-        }
-        break;
+        case MULTI_TARGET_W:
+            if (1 <= motor_id && motor_id < 5)
+            {
+                ushort *target_data = reinterpret_cast<ushort *>(buf);
+                speed = half_to_float(target_data[motor_id - 1]);
+                motor.target = speed;
+            }
+            break;
 
-    case SHAFT_FEEDBACK_R:
-        break;
+        case SHAFT_FEEDBACK_R:
+            break;
 
-    case SAVE_TO_EEPROM_W:
-        break;
+        case SAVE_TO_EEPROM_W:
+            break;
     }
 }
 
@@ -296,80 +299,80 @@ bool CANFuoco::can_tx_callback(uint8_t *buf)
 
     switch (monitor_settings.register_to_monitor)
     {
-    case SUPPLY_VOLTAGE_R:
-    {
-        float supply_voltage = 13; //get_supply_voltage();
-        memcpy(buf, &supply_voltage, len);
-        break;
-    }
+        case SUPPLY_VOLTAGE_R:
+        {
+            float supply_voltage = 13;  // get_supply_voltage();
+            memcpy(buf, &supply_voltage, len);
+            break;
+        }
 
-    case TARGET_RW:
-    case FEED_FORWARD_VELOCITY_R:
-    case SHAFT_ANGLE_R:
-    case ELECTRICAL_ANGLE_R:
-    case SHAFT_VELOCITY_R:
-    case CURRENT_SP_R:
-    case SHAFT_VELOCITY_SP_R:
-    case SHAFT_ANGLE_SP_R:
-    case VOLTAGE_D_R:
-    case VOLTAGE_Q_R:
-    case CURRENT_D_R:
-    case CURRENT_Q_R:
-    case VOLTAGE_BEMF_R:
-    case U_ALPHA_R:
-    case U_BETA_R:
-    case VOLTAGE_SENSOR_ALIGN_RW:
-    case VELOCITY_INDEX_SEARCH_RW:
-    case PHASE_RESISTANCE_RW:
-    case POLE_PAIRS_RW:
-    case KV_RATING_RW:
-    case PHASE_INDUCTANCE_RW:
-    case VOLTAGE_LIMIT_RW:
-    case CURRENT_LIMIT_RW:
-    case VELOCITY_LIMIT_RW:
-    case ENABLED_RW:
-    case MOTOR_STATUS_R:
-    case FOC_MODULATION_RW:
-    case MODULATION_CENTERED_RW:
-    case TORQUE_CONTROLLER_RW:
-    case CONTROLLER_RW:
-    case PID_CURRENT_D_P_RW:
-    case PID_CURRENT_D_I_RW:
-    case PID_CURRENT_D_D_RW:
-    case PID_CURREND_D_OUTPUT_RAMP_RW:
-    case PID_CURRENT_D_LIMIT_RW:
-    case LPF_CURRENT_D_TF_RW:
-    case PID_CURRENT_Q_P_RW:
-    case PID_CURRENT_Q_I_RW:
-    case PID_CURRENT_Q_D_RW:
-    case PID_CURRENT_Q_OUTPUT_RAMP_RW:
-    case PID_CURRENT_Q_LIMIT_RW:
-    case LPF_CURRENT_Q_TF_RW:
-    case PID_VELOCITY_P_RW:
-    case PID_VELOCITY_I_RW:
-    case PID_VELOCITY_D_RW:
-    case PID_VELOCITY_OUTPUT_RAMP_RW:
-    case PID_VELOCITY_LIMIT_RW:
-    case LPF_VELOCITY_TF_RW:
-    case P_ANGLE_P_RW:
-    case P_ANGLE_LIMIT_RW:
-    case LPF_ANGLE_TF_RW:
-    case MOTION_DOWNSAMPLE_RW:
-    case MOTION_CNT_RW:
-    case SENSOR_OFFSET_RW:
-    case ZERO_ELECTRIC_ANGLE_RW:
-    case SENSOR_DIRECTION_RW:
-    case PP_CHECK_RESULT_RW:
-        memcpy(buf, CANFuocoRegisterMapNames.at(monitor_settings.register_to_monitor), len);
-        break;
+        case TARGET_RW:
+        case FEED_FORWARD_VELOCITY_R:
+        case SHAFT_ANGLE_R:
+        case ELECTRICAL_ANGLE_R:
+        case SHAFT_VELOCITY_R:
+        case CURRENT_SP_R:
+        case SHAFT_VELOCITY_SP_R:
+        case SHAFT_ANGLE_SP_R:
+        case VOLTAGE_D_R:
+        case VOLTAGE_Q_R:
+        case CURRENT_D_R:
+        case CURRENT_Q_R:
+        case VOLTAGE_BEMF_R:
+        case U_ALPHA_R:
+        case U_BETA_R:
+        case VOLTAGE_SENSOR_ALIGN_RW:
+        case VELOCITY_INDEX_SEARCH_RW:
+        case PHASE_RESISTANCE_RW:
+        case POLE_PAIRS_RW:
+        case KV_RATING_RW:
+        case PHASE_INDUCTANCE_RW:
+        case VOLTAGE_LIMIT_RW:
+        case CURRENT_LIMIT_RW:
+        case VELOCITY_LIMIT_RW:
+        case ENABLED_RW:
+        case MOTOR_STATUS_R:
+        case FOC_MODULATION_RW:
+        case MODULATION_CENTERED_RW:
+        case TORQUE_CONTROLLER_RW:
+        case CONTROLLER_RW:
+        case PID_CURRENT_D_P_RW:
+        case PID_CURRENT_D_I_RW:
+        case PID_CURRENT_D_D_RW:
+        case PID_CURREND_D_OUTPUT_RAMP_RW:
+        case PID_CURRENT_D_LIMIT_RW:
+        case LPF_CURRENT_D_TF_RW:
+        case PID_CURRENT_Q_P_RW:
+        case PID_CURRENT_Q_I_RW:
+        case PID_CURRENT_Q_D_RW:
+        case PID_CURRENT_Q_OUTPUT_RAMP_RW:
+        case PID_CURRENT_Q_LIMIT_RW:
+        case LPF_CURRENT_Q_TF_RW:
+        case PID_VELOCITY_P_RW:
+        case PID_VELOCITY_I_RW:
+        case PID_VELOCITY_D_RW:
+        case PID_VELOCITY_OUTPUT_RAMP_RW:
+        case PID_VELOCITY_LIMIT_RW:
+        case LPF_VELOCITY_TF_RW:
+        case P_ANGLE_P_RW:
+        case P_ANGLE_LIMIT_RW:
+        case LPF_ANGLE_TF_RW:
+        case MOTION_DOWNSAMPLE_RW:
+        case MOTION_CNT_RW:
+        case SENSOR_OFFSET_RW:
+        case ZERO_ELECTRIC_ANGLE_RW:
+        case SENSOR_DIRECTION_RW:
+        case PP_CHECK_RESULT_RW:
+            memcpy(buf, CANFuocoRegisterMapNames.at(monitor_settings.register_to_monitor), len);
+            break;
 
-    case SHAFT_FEEDBACK_R:
-        memcpy(buf, &motor.shaft_velocity, sizeof(float));
-        memcpy(buf + sizeof(float), &motor.shaft_angle, sizeof(float));
-        break;
+        case SHAFT_FEEDBACK_R:
+            memcpy(buf, &motor.shaft_velocity, sizeof(float));
+            memcpy(buf + sizeof(float), &motor.shaft_angle, sizeof(float));
+            break;
 
-    default:
-        return false;
+        default:
+            return false;
     }
 
     return true;
