@@ -10,15 +10,15 @@ extern int numMotorsUsed;
 #define ADC_PCB_TEMP_PIN PB14
 #define ADC_VBUS_PIN PA0
 
-#define MAX_MOTOR_TEMP 75.0f
+#define MAX_MOTOR_TEMP 85.0f
 #define MAX_PCM_TEMP 75.0f
 #define MIN_MOTOR_TEMP -5.0f
 #define MIN_PCM_TEMP -5.0f
 
-#define WARNING_MOTOR_TEMP 65.0f
+#define WARNING_MOTOR_TEMP 75.0f
 #define WARNING_PCB_TEMP 65.0f
 
-#define NORMAL_CURRENT_LIMIT 12.0
+#define NORMAL_CURRENT_LIMIT 8.0
 #define WARNING_CURRENT_LIMIT 1.0
 
 #define VBUS_WARNING_UNDERVOLT 21.0f
