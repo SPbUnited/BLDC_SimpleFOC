@@ -122,7 +122,7 @@ void init(bool is_warning = false)
     // motor.LPF_current_q = 0.001f;
 }
 
-void reinit()
+void reinit(bool is_warning)
 {
     // driver.disable();
     // motor.disable();
@@ -132,7 +132,7 @@ void reinit()
     // driver.init();
     // motor.init();
     // motor.initFOC();
-    motor.PID_velocity.limit = WARNING_CURRENT_LIMIT;
+    motor.PID_velocity.limit = is_warning ? WARNING_CURRENT_LIMIT : NORMAL_CURRENT_LIMIT;
 }
 
 double get_motor_temp()
