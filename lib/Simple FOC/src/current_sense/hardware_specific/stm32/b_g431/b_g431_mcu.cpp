@@ -89,7 +89,7 @@ float _readADCVoltageLowSide(const int pin, const void* cs_params)
     return raw_adc * ((Stm32CurrentSenseParams*)cs_params)->adc_voltage_conv;
 }
 
-void _configureOPAMP(OPAMP_HandleTypeDef* hopamp, OPAMP_TypeDef* OPAMPx_Def)
+bool _configureOPAMP(OPAMP_HandleTypeDef* hopamp, OPAMP_TypeDef* OPAMPx_Def)
 {
     // could this be replaced with LL_OPAMP calls??
     hopamp->Instance = OPAMPx_Def;
@@ -104,15 +104,19 @@ void _configureOPAMP(OPAMP_HandleTypeDef* hopamp, OPAMP_TypeDef* OPAMPx_Def)
     if (HAL_OPAMP_Init(hopamp) != HAL_OK)
     {
         SIMPLEFOC_DEBUG("HAL_OPAMP_Init failed!");
+        return false;
     }
+    return true;
 }
-void _configureOPAMPs(OPAMP_HandleTypeDef* OPAMPA, OPAMP_HandleTypeDef* OPAMPB,
+
+bool _configureOPAMPs(OPAMP_HandleTypeDef* OPAMPA, OPAMP_HandleTypeDef* OPAMPB,
                       OPAMP_HandleTypeDef* OPAMPC)
 {
     // Configure the opamps
-    _configureOPAMP(OPAMPA, OPAMP1);
-    _configureOPAMP(OPAMPB, OPAMP2);
-    _configureOPAMP(OPAMPC, OPAMP3);
+    bool opamp1_ok = _configureOPAMP(OPAMPA, OPAMP1);
+    bool opamp2_ok = _configureOPAMP(OPAMPB, OPAMP2);
+    bool opamp3_ok = _configureOPAMP(OPAMPC, OPAMP3);
+    return opamp1_ok && opamp2_ok && opamp3_ok;
 }
 
 void MX_DMA1_Init(ADC_HandleTypeDef* hadc, DMA_HandleTypeDef* hdma_adc,
@@ -151,12 +155,13 @@ void* _configureADCInline(const void* driver_params, const int pinA, const int p
 void* _configureADCLowSide(const void* driver_params, const int pinA, const int pinB,
                            const int pinC)
 {
-    _UNUSED(driver_params);
-
     HAL_Init();
     MX_GPIO_Init();
     MX_DMA_Init();
-    _configureOPAMPs(&hopamp1, &hopamp3, &hopamp2);
+    if (!_configureOPAMPs(&hopamp1, &hopamp3, &hopamp2))
+    {
+        return SIMPLEFOC_CURRENT_SENSE_INIT_FAILED;
+    }
     MX_ADC1_Init(&hadc1);
     MX_ADC2_Init(&hadc2);
 
@@ -175,13 +180,31 @@ void* _configureADCLowSide(const void* driver_params, const int pinA, const int 
         SIMPLEFOC_DEBUG("DMA read init failed");
     }
 
-    HAL_OPAMP_Start(&hopamp1);
-    HAL_OPAMP_Start(&hopamp2);
-    HAL_OPAMP_Start(&hopamp3);
+    bool opamp1_started = HAL_OPAMP_Start(&hopamp1) == HAL_OK;
+    bool opamp2_started = HAL_OPAMP_Start(&hopamp2) == HAL_OK;
+    bool opamp3_started = HAL_OPAMP_Start(&hopamp3) == HAL_OK;
+    if (!opamp1_started || !opamp2_started || !opamp3_started)
+    {
+        SIMPLEFOC_DEBUG("HAL_OPAMP_Start failed!");
+        if (opamp1_started)
+        {
+            HAL_OPAMP_Stop(&hopamp1);
+        }
+        if (opamp2_started)
+        {
+            HAL_OPAMP_Stop(&hopamp2);
+        }
+        if (opamp3_started)
+        {
+            HAL_OPAMP_Stop(&hopamp3);
+        }
+        return SIMPLEFOC_CURRENT_SENSE_INIT_FAILED;
+    }
 
     Stm32CurrentSenseParams* params = new Stm32CurrentSenseParams{
         .pins = {pinA, pinB, pinC},
         .adc_voltage_conv = (_ADC_VOLTAGE) / (_ADC_RESOLUTION),
+        .adc_handle = &hadc1,
         .timer_handle = ((STM32DriverParams*)driver_params)->timers_handle[0],
     };
 

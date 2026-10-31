@@ -1,125 +1,93 @@
-// #define SPI_SR_TXP
-
-#include "can/can.h"
-#include "error/error.h"
 #include "hw/hw.h"
-#include "id/id.h"
-#include "led/led.h"
 
-uint8_t motor_id = 0;
+// Status values: 0 = not initialized, 1 = success, -1 = failure.
+volatile int driver_init_status = 0;
+volatile int current_sense_init_status = 0;
+
+volatile float phase_current_a = 0.0f;
+volatile float phase_current_b = 0.0f;
+volatile float phase_current_c = 0.0f;
+
+volatile float phase_voltage_a = 0.0f;
+volatile float phase_voltage_b = 0.0f;
+volatile float phase_voltage_c = 0.0f;
+
+// Debugger-selectable state: 0=A, 1=AB, 2=B, 3=BC, 4=C, 5=CA.
+volatile uint8_t test_commutation_state = 0;
+
+namespace
+{
+constexpr float TEST_VOLTAGE_AMPLITUDE = 24.0f;
+constexpr uint32_t TEST_PULSE_HALF_PERIOD_MS = 2000;
+}  // namespace
 
 void setup()
 {
-    led::init();
-    led::set_blink_led(led::CYAN, led::OFF, 100);
+    const bool initialized = hw::init_current_sense_test();
+    driver_init_status = hw::driver.initialized ? 1 : -1;
+    current_sense_init_status = hw::current_sense.initialized ? 1 : -1;
 
-    led::delay(200);
-
-    id::init();
-    hw::init();
-
-    led::set_blink_led(led::BLUE, led::OFF, 50);
-    led::delay(200);
-
-    motor_id = id::get_id();
-    hw::motor.target = 0;
-
-    can::init();
-
-    led::set_blink_led(led::GREEN, led::BLUE, 50, 0.5);
-    for (int i = 0; i < 10; i++)
+    if (!initialized)
     {
-        led::tick();
-        delay(20);
+        hw::driver.disable();
     }
-
-    led::set_blink_led(led::YELLOW);
 }
-
-uint8_t current_errors = error::NONE;
-uint8_t current_warnings = error::NONE;
-
-uint32_t last_time = 0;
-uint32_t dt = 0;
-
-float motor_temp = 0;
-float pcb_temp = 0;
-float vbus = 24.0;
-
-float vbus_filter_alpha = 0.0001;
 
 void loop()
 {
-    dt = micros() - last_time;
-    last_time = micros();
-
-    motor_temp = hw::get_motor_temp();
-    pcb_temp = hw::get_pcb_temp();
-    vbus = vbus_filter_alpha * hw::get_vbus() + (1.0 - vbus_filter_alpha) * vbus;
-
-    if (motor_id != 0)
+    if (driver_init_status != 1 || current_sense_init_status != 1)
     {
-        current_errors |= hw::motor.motor_status == FOCMotorStatus::motor_init_failed
-                              ? error::MOTOR_INIT_FAILED
-                              : error::NONE;
-        current_errors |= hw::motor.motor_status == FOCMotorStatus::motor_calib_failed
-                              ? error::MOTOR_CALIB_FAILED
-                              : error::NONE;
-        current_errors |= hw::motor.motor_status == FOCMotorStatus::motor_error
-                              ? error::MOTOR_ERROR
-                              : error::NONE;
-        current_errors |= !hw::is_pcb_temp_ok(pcb_temp) ? error::PCB_TEMP : error::NONE;
-        current_errors |= !hw::is_motor_temp_ok(motor_temp) ? error::MOTOR_TEMP : error::NONE;
-        current_errors |= hw::is_vbus_undervolt_error(vbus) ? error::VBUS_UNDERVOLT : error::NONE;
-
-        current_warnings |= hw::is_pcb_temp_warning(pcb_temp) ? error::PCB_TEMP : error::NONE;
-        current_warnings |=
-            hw::is_motor_temp_warning(motor_temp) ? error::MOTOR_TEMP : error::NONE;
-        current_warnings |=
-            hw::is_vbus_undervolt_warning(vbus) ? error::VBUS_UNDERVOLT : error::NONE;
-
-        if (current_errors == error::NONE && current_warnings == error::NONE)
-        {
-            hw::foc_loop();
-            led::set_blink_led(led::GREEN, led::OFF, 2500, 1 - 0.025);
-        }
-        else if (current_warnings != error::NONE && current_errors == error::NONE)
-        {
-            // static bool was_warning = false;
-
-            // hw::reinit(true);
-
-            hw::foc_loop();
-            led::set_blink_led(led::GREEN, led::YELLOW, 1000 * current_warnings, 0.5);
-        }
-        else
-        {
-            hw::foc_abort();
-            led::set_blink_led(led::RED, led::YELLOW, 1000 * current_errors, 0.5);
-        }
-    }
-    else
-    {
-        static uint32_t timer1 = 0;
-        static int8_t flag = 0;
-
-        hw::motor.loopFOC();
-        if (millis() - timer1 >= 2000)
-        {
-            flag += 1;
-            if (flag >= 2)
-                flag = 0;
-            timer1 = millis();
-        }
-        if (flag == 0)
-        {
-            hw::motor.move(10);
-        }
-        else if (flag == 1)
-        {
-            hw::motor.move(-5);
-        }
+        return;
     }
 
-    led::tick();
+    static uint32_t last_toggle_ms = millis();
+    static bool pulse_high = false;
+    const uint32_t current_time_ms = millis();
+    if (current_time_ms - last_toggle_ms >= TEST_PULSE_HALF_PERIOD_MS)
+    {
+        pulse_high = !pulse_high;
+        last_toggle_ms = current_time_ms;
+    }
+
+    const PhaseCurrent_s currents = hw::current_sense.getPhaseCurrents();
+    phase_current_a = currents.a;
+    phase_current_b = currents.b;
+    phase_current_c = currents.c;
+
+    bool phase_a_active = false;
+    bool phase_b_active = false;
+    bool phase_c_active = false;
+
+    switch (test_commutation_state)
+    {
+        case 0:
+            phase_a_active = true;
+            break;
+        case 1:
+            phase_a_active = true;
+            phase_b_active = true;
+            break;
+        case 2:
+            phase_b_active = true;
+            break;
+        case 3:
+            phase_b_active = true;
+            phase_c_active = true;
+            break;
+        case 4:
+            phase_c_active = true;
+            break;
+        case 5:
+            phase_c_active = true;
+            phase_a_active = true;
+            break;
+        default:
+            break;
+    }
+
+    phase_voltage_a = phase_a_active && pulse_high ? TEST_VOLTAGE_AMPLITUDE : 0.0f;
+    phase_voltage_b = phase_b_active && pulse_high ? TEST_VOLTAGE_AMPLITUDE : 0.0f;
+    phase_voltage_c = phase_c_active && pulse_high ? TEST_VOLTAGE_AMPLITUDE : 0.0f;
+
+    hw::driver.setPwm(phase_voltage_a, phase_voltage_b, phase_voltage_c);
 }

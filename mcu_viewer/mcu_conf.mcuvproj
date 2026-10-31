@@ -9,7 +9,7 @@ version = 2
 sample_frequency_hz = 100
 max_points = 10000
 max_viewport_points = 5000
-viewport_width_ms = 5000.000000
+viewport_width_ms = 5000,000000
 refresh_on_elf_change = true
 stop_acq_on_elf_change = true
 probe_type = 0
@@ -20,20 +20,34 @@ probe_sn = 190017000C0000545448534E
 should_log = false
 log_directory = 
 gdb_command = gdb
+elf_parser = gdb
 recorder_enabled = false
 restart_on_group_change = true
 keep_connection = true
 ip_address = 127.0.0.1
 port = 3333
+probe_baudrate = 115200
+jlink_script_enabled = false
+jlink_script_path = 
+jlink_connection_type = 0
+cubeprog_api_path = 
+mcp_server_port = 8765
+
+[flashing]
+file_path = 
+command = 
+use_elf_file = false
+timeout_enabled = false
+timeout_seconds = 5
 
 [trace_settings]
 core_frequency = 160000
 trace_prescaler = 10
 max_points = 10000
 max_viewport_points_percent = 10
-viewport_width_ms = 5.000000
+viewport_width_ms = 5,000000
 trigger_channel = -1
-trigger_level = 0.900000
+trigger_level = 0,000000
 timeout = 2
 probe_type = 0
 target_name = 
@@ -52,8 +66,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var1]
 name = adcBuffer1[1]
@@ -65,8 +83,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var2]
 name = adcBuffer1[2]
@@ -78,8 +100,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var3]
 name = adcBuffer1[3]
@@ -91,8 +117,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var4]
 name = adcBuffer2[0]
@@ -104,8 +134,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var5]
 name = adcBuffer2[1]
@@ -117,8 +151,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var6]
 name = adcBuffer2[2]
@@ -130,8 +168,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var7]
 name = buf[0]
@@ -143,8 +185,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var8]
 name = counter
@@ -156,8 +202,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var9]
 name = current_errors
@@ -169,8 +219,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var10]
 name = current_sense_align_status
@@ -182,8 +236,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var11]
 name = current_warnings
@@ -195,8 +253,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var12]
 name = currents.a
@@ -208,8 +270,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var13]
 name = currents.b
@@ -221,8 +287,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var14]
 name = currents.c
@@ -234,8 +304,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var15]
 name = dt
@@ -247,8 +321,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var16]
 name = hw::motor.LPF_angle.Tf
@@ -260,8 +338,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var17]
 name = hw::motor.LPF_current_d.Tf
@@ -273,8 +355,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.004000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var18]
 name = hw::motor.LPF_current_q.Tf
@@ -286,8 +372,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.001000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var19]
 name = hw::motor.LPF_velocity.Tf
@@ -299,8 +389,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.020000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var20]
 name = hw::motor.PID_current_d.D
@@ -312,8 +406,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var21]
 name = hw::motor.PID_current_d.I
@@ -325,8 +423,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 300.000000
+value_to_write = 300,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var22]
 name = hw::motor.PID_current_d.P
@@ -338,8 +440,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 3.000000
+value_to_write = 3,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var23]
 name = hw::motor.PID_current_d.limit
@@ -351,8 +457,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 25.000000
+value_to_write = 25,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var24]
 name = hw::motor.PID_current_d.output_ramp
@@ -364,8 +474,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var25]
 name = hw::motor.PID_current_q.D
@@ -377,8 +491,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var26]
 name = hw::motor.PID_current_q.I
@@ -390,8 +508,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 100.000000
+value_to_write = 100,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var27]
 name = hw::motor.PID_current_q.P
@@ -403,8 +525,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 3.000000
+value_to_write = 3,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var28]
 name = hw::motor.PID_current_q.limit
@@ -416,8 +542,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 25.000000
+value_to_write = 25,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var29]
 name = hw::motor.PID_current_q.output_ramp
@@ -429,8 +559,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var30]
 name = hw::motor.PID_velocity.D
@@ -442,8 +576,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var31]
 name = hw::motor.PID_velocity.I
@@ -455,8 +593,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.800000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var32]
 name = hw::motor.PID_velocity.P
@@ -468,8 +610,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.080000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var33]
 name = hw::motor.PID_velocity.limit
@@ -481,8 +627,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 8.000000
+value_to_write = 8,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var34]
 name = hw::motor.PID_velocity.output_ramp
@@ -494,8 +644,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var35]
 name = hw::motor.P_angle.P
@@ -507,8 +661,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 10.000000
+value_to_write = 10,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var36]
 name = hw::motor.P_angle.limit
@@ -520,8 +678,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 20.000000
+value_to_write = 20,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var37]
 name = hw::motor.Ua
@@ -533,8 +695,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var38]
 name = hw::motor.Ub
@@ -546,8 +712,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var39]
 name = hw::motor.Uc
@@ -559,8 +729,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var40]
 name = hw::motor.controller
@@ -572,8 +746,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 3
-value_to_write = 1.000000
+value_to_write = 1,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var41]
 name = hw::motor.current.d
@@ -585,8 +763,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var42]
 name = hw::motor.current.q
@@ -598,8 +780,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var43]
 name = hw::motor.current_limit
@@ -611,8 +797,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 1.000000
+value_to_write = 1,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var44]
 name = hw::motor.current_sp
@@ -624,8 +814,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var45]
 name = hw::motor.electrical_angle
@@ -637,8 +831,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var46]
 name = hw::motor.modulation_centered
@@ -650,8 +848,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var47]
 name = hw::motor.shaft_angle
@@ -663,8 +865,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var48]
 name = hw::motor.shaft_angle_sp
@@ -676,8 +882,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var49]
 name = hw::motor.shaft_velocity
@@ -689,8 +899,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var50]
 name = hw::motor.shaft_velocity_sp
@@ -702,8 +916,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var51]
 name = hw::motor.target
@@ -715,8 +933,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 150.000000
+value_to_write = 150,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var52]
 name = hw::motor.torque_controller
@@ -728,8 +950,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 3
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var53]
 name = hw::motor.velocity_limit
@@ -741,8 +967,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 10.000000
+value_to_write = 10,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var54]
 name = hw::motor.voltage.d
@@ -754,8 +984,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var55]
 name = hw::motor.voltage.q
@@ -767,8 +1001,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var56]
 name = hw::motor.voltage_bemf
@@ -780,8 +1018,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var57]
 name = hw::motor.voltage_limit
@@ -793,8 +1035,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 25.000000
+value_to_write = 2,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var58]
 name = last_time
@@ -806,8 +1052,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var59]
 name = motor_id
@@ -819,8 +1069,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var60]
 name = motor_temp
@@ -832,8 +1086,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 89.000000
+value_to_write = 89,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var61]
 name = pcb_temp
@@ -845,8 +1103,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 0.000000
+value_to_write = 0,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [var62]
 name = vbus
@@ -858,8 +1120,12 @@ should_update_from_elf = true
 shift = 0
 mask = 4294967295
 high_level_type = 0
-value_to_write = 19.500000
+value_to_write = 19,000000
+secondary_value_to_write = 0,000000
 do_not_interpret_as_enum = false
+write_limits_enabled = false
+write_limit_min = -1,000000
+write_limit_max = 1,000000
 
 [group0]
 name = new group0
@@ -869,6 +1135,7 @@ acquisition_type = 0
 name = current_sense
 type = 2
 visibility = false
+secondary_write_enabled = true
 
 [group0-plot0-series0]
 name = current_sense_align_status
@@ -893,7 +1160,8 @@ format = DEC
 [group0-plot1]
 name = currents
 type = 0
-visibility = true
+visibility = false
+secondary_write_enabled = true
 
 [group0-plot1-series0]
 name = hw::motor.current.d
@@ -914,6 +1182,7 @@ format = DEC
 name = fvel
 type = 0
 visibility = false
+secondary_write_enabled = true
 
 [group0-plot2-series0]
 name = counter
@@ -924,6 +1193,7 @@ format = DEC
 name = pos
 type = 0
 visibility = true
+secondary_write_enabled = true
 
 [group0-plot3-series0]
 name = hw::motor.shaft_angle
@@ -948,7 +1218,8 @@ format = DEC
 [group0-plot4]
 name = settings
 type = 2
-visibility = false
+visibility = true
+secondary_write_enabled = true
 
 [group0-plot4-series0]
 name = buf[0]
@@ -1043,7 +1314,8 @@ format = DEC
 [group0-plot5]
 name = target
 type = 2
-visibility = true
+visibility = false
+secondary_write_enabled = true
 
 [group0-plot5-series0]
 name = dt
@@ -1084,6 +1356,7 @@ format = DEC
 name = temp
 type = 2
 visibility = true
+secondary_write_enabled = true
 
 [group0-plot6-series0]
 name = current_errors
@@ -1091,91 +1364,114 @@ visibility = true
 format = DEC
 
 [group0-plot6-series1]
-name = dt
+name = current_warnings
 visibility = true
 format = DEC
 
 [group0-plot6-series2]
-name = last_time
+name = dt
 visibility = true
 format = DEC
 
 [group0-plot6-series3]
-name = motor_id
+name = last_time
 visibility = true
 format = DEC
 
 [group0-plot6-series4]
-name = motor_temp
+name = motor_id
 visibility = true
 format = DEC
 
 [group0-plot6-series5]
-name = pcb_temp
+name = motor_temp
 visibility = true
 format = DEC
 
 [group0-plot6-series6]
+name = pcb_temp
+visibility = true
+format = DEC
+
+[group0-plot6-series7]
 name = vbus
 visibility = true
 format = DEC
 
 [group0-plot7]
-name = vbus
+name = temp_plot
 type = 0
-visibility = false
+visibility = true
+secondary_write_enabled = true
 
 [group0-plot7-series0]
-name = vbus
+name = motor_temp
+visibility = true
+format = DEC
+
+[group0-plot7-series1]
+name = pcb_temp
 visibility = true
 format = DEC
 
 [group0-plot8]
+name = vbus
+type = 0
+visibility = false
+secondary_write_enabled = true
+
+[group0-plot8-series0]
+name = vbus
+visibility = true
+format = DEC
+
+[group0-plot9]
 name = vel controller
 type = 2
 visibility = true
+secondary_write_enabled = true
 
-[group0-plot8-series0]
+[group0-plot9-series0]
 name = hw::motor.LPF_velocity.Tf
 visibility = true
 format = DEC
 
-[group0-plot8-series1]
+[group0-plot9-series1]
 name = hw::motor.PID_velocity.D
 visibility = true
 format = DEC
 
-[group0-plot8-series2]
+[group0-plot9-series2]
 name = hw::motor.PID_velocity.I
 visibility = true
 format = DEC
 
-[group0-plot8-series3]
+[group0-plot9-series3]
 name = hw::motor.PID_velocity.P
 visibility = true
 format = DEC
 
-[group0-plot8-series4]
+[group0-plot9-series4]
 name = hw::motor.PID_velocity.limit
 visibility = true
 format = DEC
 
-[group0-plot8-series5]
+[group0-plot9-series5]
 name = hw::motor.PID_velocity.output_ramp
 visibility = false
 format = DEC
 
-[group0-plot8-series6]
+[group0-plot9-series6]
 name = hw::motor.P_angle.P
 visibility = true
 format = DEC
 
-[group0-plot8-series7]
+[group0-plot9-series7]
 name = hw::motor.P_angle.limit
 visibility = true
 format = DEC
 
-[group0-plot8-series8]
+[group0-plot9-series8]
 name = hw::motor.velocity_limit
 visibility = true
 format = DEC
@@ -1188,6 +1484,7 @@ acquisition_type = 0
 name = angles
 type = 0
 visibility = false
+secondary_write_enabled = true
 
 [group1-plot0-series0]
 name = hw::motor.electrical_angle
@@ -1203,6 +1500,7 @@ format = DEC
 name = currents
 type = 0
 visibility = true
+secondary_write_enabled = true
 
 [group1-plot1-series0]
 name = hw::motor.current.d
@@ -1223,6 +1521,7 @@ format = DEC
 name = dma
 type = 2
 visibility = false
+secondary_write_enabled = true
 
 [group1-plot2-series0]
 name = adcBuffer1[0]
@@ -1263,6 +1562,7 @@ format = DEC
 name = pos
 type = 0
 visibility = true
+secondary_write_enabled = true
 
 [group1-plot3-series0]
 name = hw::motor.shaft_angle
@@ -1288,6 +1588,7 @@ format = DEC
 name = target
 type = 2
 visibility = true
+secondary_write_enabled = true
 
 [group1-plot4-series0]
 name = current_errors
@@ -1358,6 +1659,7 @@ format = DEC
 name = voltages
 type = 0
 visibility = true
+secondary_write_enabled = true
 
 [group1-plot5-series0]
 name = hw::motor.Ua

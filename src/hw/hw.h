@@ -47,6 +47,28 @@ MagneticSensorAS5048A hall_encoder = MagneticSensorAS5048A(pinNametoDigitalPin(P
 LowsideCurrentSense current_sense =
     LowsideCurrentSense(0.003f, -9.0f, A_OP1_OUT, A_OP2_OUT, A_OP3_OUT);
 
+bool init_current_sense_test()
+{
+    driver.voltage_power_supply = 24.0f;
+    driver.voltage_limit = driver.voltage_power_supply;
+    driver.pwm_frequency = 20000;
+    if (!driver.init())
+    {
+        return false;
+    }
+
+    current_sense.skip_align = true;
+    current_sense.linkDriver(&driver);
+    if (!current_sense.init())
+    {
+        driver.disable();
+        return false;
+    }
+
+    driver.enable();
+    return true;
+}
+
 void init(bool is_warning = false)
 {
     // hall_encoder.init();
@@ -54,7 +76,11 @@ void init(bool is_warning = false)
     driver.voltage_power_supply = 24.0;
     driver.voltage_limit = driver.voltage_power_supply;
     driver.pwm_frequency = is_warning ? 10000 : 20000;
-    driver.init();
+    if (!driver.init())
+    {
+        motor.motor_status = FOCMotorStatus::motor_init_failed;
+        return;
+    }
 
     hall_encoder.init(&SPI_3);
 
@@ -76,8 +102,18 @@ void init(bool is_warning = false)
     motor.sensor_direction = Direction::CW;
     motor.voltage_sensor_align = 6.0;
 
-    motor.init();
-    current_sense.init();
+    if (!current_sense.init())
+    {
+        motor.motor_status = FOCMotorStatus::motor_init_failed;
+        driver.disable();
+        return;
+    }
+
+    if (!motor.init())
+    {
+        driver.disable();
+        return;
+    }
 
     motor.initFOC();
 

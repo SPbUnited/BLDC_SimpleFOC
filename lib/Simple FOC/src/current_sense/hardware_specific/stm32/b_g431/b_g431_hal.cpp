@@ -251,8 +251,7 @@ void MX_ADC2_Init(ADC_HandleTypeDef* hadc2)
 /** Configure Regular Channel
  */
 #ifdef OPAMP_USE_INTERNAL_CHANNEL
-    sConfig.Channel =
-        ADC_CHANNEL_16;  // ADC2_IN3 = PA6 = OP2_OUT or ADC2_IN16 for internal channel
+    sConfig.Channel = ADC_CHANNEL_16;  // OPAMP2 internal output
 #else
     sConfig.Channel = ADC_CHANNEL_3;  // ADC2_IN3 = PA6 = OP2_OUT or ADC2_IN16 for internal channel
 #endif
@@ -265,22 +264,11 @@ void MX_ADC2_Init(ADC_HandleTypeDef* hadc2)
     {
         SIMPLEFOC_DEBUG("HAL_ADC_ConfigChannel failed!");
     }
-    sConfig.Channel = ADC_CHANNEL_17;
-    sConfig.Rank = ADC_REGULAR_RANK_1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
-    sConfig.SingleDiff = ADC_SINGLE_ENDED;
-    sConfig.OffsetNumber = ADC_OFFSET_NONE;
-    sConfig.Offset = 0;
-    if (HAL_ADC_ConfigChannel(hadc2, &sConfig) != HAL_OK)
-    {
-        Error_Handler();
-    }
 
 #ifdef OPAMP_USE_INTERNAL_CHANNEL
     /** Configure Regular Channel
      */
-    sConfig.Channel =
-        ADC_CHANNEL_18;  // ADC1_IN12 = PB1 = OP3_OUT or ADC2_IN18 for internal channel
+    sConfig.Channel = ADC_CHANNEL_18;  // OPAMP3 internal output
     sConfig.Rank = ADC_REGULAR_RANK_2;
     sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
     sConfig.SingleDiff = ADC_SINGLE_ENDED;
