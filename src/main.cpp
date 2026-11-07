@@ -42,8 +42,8 @@ uint8_t current_warnings = error::NONE;
 uint32_t last_time = 0;
 uint32_t dt = 0;
 
-float motor_temp = 0;
-float pcb_temp = 0;
+volatile float motor_temp = 0;
+volatile float pcb_temp = 0;
 float vbus = 24.0;
 
 float vbus_filter_alpha = 0.0001;

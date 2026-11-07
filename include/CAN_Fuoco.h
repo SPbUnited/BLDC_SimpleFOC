@@ -115,6 +115,8 @@ enum CANFuocoRegisterMap
     // Virtual registers
     MULTI_TARGET_W = 96,
     SHAFT_FEEDBACK_R = 102,
+    PCB_TEMPERATURE_R = 103,
+    MOTOR_TEMPERATURE_R = 104,
     SAVE_TO_EEPROM_W = 127,
 };
 
@@ -122,19 +124,23 @@ struct CANFuocoMotorConfig
 {
     uint8_t &motor_id;
     float (*get_supply_voltage)(void) = nullptr;
+    float (*get_pcb_temperature)(void) = nullptr;
+    float (*get_motor_temperature)(void) = nullptr;
     BLDCMotor &motor;
     float speed = 0;
 };
 
 struct CANFuocoMonitorSettings
 {
-    CANFuocoRegisterMap register_to_monitor;
+    uint8_t registers[4] = {SHAFT_FEEDBACK_R, 0, 0, 0};
 };
 
 class CANFuoco : public CANFuocoMotorConfig
 {
   private:
-    CANFuocoMonitorSettings monitor_settings = {SHAFT_FEEDBACK_R};
+    CANFuocoMonitorSettings monitor_settings;
+    uint8_t monitor_index = 0;
+    CANFuocoRegisterMap active_feedback_register = SHAFT_FEEDBACK_R;
 
     std::map<CANFuocoRegisterMap, uint8_t *> CANFuocoRegisterMapNames;
 
@@ -224,9 +230,11 @@ void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
             break;
 
         case MONITOR_SETTINGS_RW:
-            if (len >= sizeof(uint8_t))
+            if (len >= 1 && len <= sizeof(monitor_settings.registers))
             {
-                monitor_settings.register_to_monitor = static_cast<CANFuocoRegisterMap>(buf[0]);
+                memset(monitor_settings.registers, 0, sizeof(monitor_settings.registers));
+                memcpy(monitor_settings.registers, buf, len);
+                monitor_index = 0;
             }
             break;
 
@@ -299,7 +307,23 @@ void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
  */
 uint8_t CANFuoco::can_tx_callback(uint8_t *buf)
 {
-    switch (monitor_settings.register_to_monitor)
+    for (uint8_t checked = 0; checked < 4; ++checked)
+    {
+        const auto reg =
+            static_cast<CANFuocoRegisterMap>(monitor_settings.registers[monitor_index]);
+        monitor_index = (monitor_index + 1) % 4;
+        if (reg != EMERGENCY_STOP_W)
+        {
+            active_feedback_register = reg;
+            break;
+        }
+        if (checked == 3)
+        {
+            return 0;
+        }
+    }
+
+    switch (active_feedback_register)
     {
         case SUPPLY_VOLTAGE_R:
         {
@@ -310,6 +334,21 @@ uint8_t CANFuoco::can_tx_callback(uint8_t *buf)
             float supply_voltage = get_supply_voltage();
             memcpy(buf, &supply_voltage, sizeof(supply_voltage));
             return sizeof(supply_voltage);
+        }
+
+        case PCB_TEMPERATURE_R:
+        case MOTOR_TEMPERATURE_R:
+        {
+            auto get_temperature = active_feedback_register == PCB_TEMPERATURE_R
+                                       ? get_pcb_temperature
+                                       : get_motor_temperature;
+            if (get_temperature == nullptr)
+            {
+                return 0;
+            }
+            const float temperature = get_temperature();
+            memcpy(buf, &temperature, sizeof(temperature));
+            return sizeof(temperature);
         }
 
         case TARGET_RW:
@@ -370,7 +409,7 @@ uint8_t CANFuoco::can_tx_callback(uint8_t *buf)
         case SENSOR_DIRECTION_RW:
         case PP_CHECK_RESULT_RW:
         {
-            auto reg = monitor_settings.register_to_monitor;
+            auto reg = active_feedback_register;
             size_t len =
                 (reg == ENABLED_RW || reg == MODULATION_CENTERED_RW || reg == PP_CHECK_RESULT_RW)
                     ? sizeof(bool)
@@ -395,5 +434,5 @@ uint8_t CANFuoco::can_tx_callback(uint8_t *buf)
 
 CANFuocoRegisterMap CANFuoco::feedback_register() const
 {
-    return monitor_settings.register_to_monitor;
+    return active_feedback_register;
 }

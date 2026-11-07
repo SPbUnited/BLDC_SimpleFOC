@@ -12,6 +12,8 @@ float get_vbus(void);
 }  // namespace hw
 
 extern uint8_t motor_id;
+extern volatile float motor_temp;
+extern volatile float pcb_temp;
 
 namespace can
 {
@@ -26,6 +28,8 @@ uint8_t TxData[8];
 CANFuocoMotorConfig motor_config = {
     .motor_id = motor_id,
     .get_supply_voltage = hw::get_vbus,
+    .get_pcb_temperature = []() { return pcb_temp; },
+    .get_motor_temperature = []() { return motor_temp; },
     .motor = hw::motor,
 };
 
