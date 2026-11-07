@@ -114,7 +114,7 @@
     },
     {
       "name": "current_sense_init_status",
-      "address": "0x20000774",
+      "address": "0x20000768",
       "type": "i32",
       "color": "#FF17A398"
     },
@@ -144,7 +144,7 @@
     },
     {
       "name": "driver_init_status",
-      "address": "0x20000778",
+      "address": "0x2000076C",
       "type": "i32",
       "color": "#FFE4572E"
     },
@@ -156,160 +156,160 @@
     },
     {
       "name": "hw::motor.LPF_angle.Tf",
-      "address": "0x20000A24",
+      "address": "0x20000A18",
       "type": "f32",
       "color": "#A25F61F3"
     },
     {
       "name": "hw::motor.LPF_current_d.Tf",
-      "address": "0x200009B4",
+      "address": "0x200009A8",
       "type": "f32",
       "color": "#BE49699F"
     },
     {
       "name": "hw::motor.LPF_current_q.Tf",
-      "address": "0x200009A4",
+      "address": "0x20000998",
       "type": "f32",
       "color": "#B5CBEC1D"
     },
     {
       "name": "hw::motor.LPF_velocity.Tf",
-      "address": "0x20000A14",
+      "address": "0x20000A08",
       "type": "f32",
       "color": "#0FE5C485"
     },
     {
       "name": "hw::motor.PID_current_d.D",
-      "address": "0x20000984",
+      "address": "0x20000978",
       "type": "f32",
       "color": "#9CFA46CE"
     },
     {
       "name": "hw::motor.PID_current_d.I",
-      "address": "0x20000980",
+      "address": "0x20000974",
       "type": "f32",
       "color": "#106934EB",
       "value_to_write": 300.0
     },
     {
       "name": "hw::motor.PID_current_d.P",
-      "address": "0x2000097C",
+      "address": "0x20000970",
       "type": "f32",
       "color": "#295523EB",
       "value_to_write": 3.0
     },
     {
       "name": "hw::motor.PID_current_d.limit",
-      "address": "0x2000098C",
+      "address": "0x20000980",
       "type": "f32",
       "color": "#579BEDC1",
       "value_to_write": 25.0
     },
     {
       "name": "hw::motor.PID_current_d.output_ramp",
-      "address": "0x20000988",
+      "address": "0x2000097C",
       "type": "f32",
       "color": "#B61C038D"
     },
     {
       "name": "hw::motor.PID_current_q.D",
-      "address": "0x2000095C",
+      "address": "0x20000950",
       "type": "f32",
       "color": "#090888AA"
     },
     {
       "name": "hw::motor.PID_current_q.I",
-      "address": "0x20000958",
+      "address": "0x2000094C",
       "type": "f32",
       "color": "#9E10C445",
       "value_to_write": 100.0
     },
     {
       "name": "hw::motor.PID_current_q.P",
-      "address": "0x20000954",
+      "address": "0x20000948",
       "type": "f32",
       "color": "#20D85CA9",
       "value_to_write": 3.0
     },
     {
       "name": "hw::motor.PID_current_q.limit",
-      "address": "0x20000964",
+      "address": "0x20000958",
       "type": "f32",
       "color": "#1799E536",
       "value_to_write": 25.0
     },
     {
       "name": "hw::motor.PID_current_q.output_ramp",
-      "address": "0x20000960",
+      "address": "0x20000954",
       "type": "f32",
       "color": "#8DE0F464"
     },
     {
       "name": "hw::motor.PID_velocity.D",
-      "address": "0x200009CC",
+      "address": "0x200009C0",
       "type": "f32",
       "color": "#10FCAA7E"
     },
     {
       "name": "hw::motor.PID_velocity.I",
-      "address": "0x200009C8",
+      "address": "0x200009BC",
       "type": "f32",
       "color": "#C9FDA2FD"
     },
     {
       "name": "hw::motor.PID_velocity.P",
-      "address": "0x200009C4",
+      "address": "0x200009B8",
       "type": "f32",
       "color": "#52323B79"
     },
     {
       "name": "hw::motor.PID_velocity.limit",
-      "address": "0x200009D4",
+      "address": "0x200009C8",
       "type": "f32",
       "color": "#C7E59FCA",
       "value_to_write": 8.0
     },
     {
       "name": "hw::motor.PID_velocity.output_ramp",
-      "address": "0x200009D0",
+      "address": "0x200009C4",
       "type": "f32",
       "color": "#BFC36C7D"
     },
     {
       "name": "hw::motor.P_angle.P",
-      "address": "0x200009EC",
+      "address": "0x200009E0",
       "type": "f32",
       "color": "#C6852FCA",
       "value_to_write": 10.0
     },
     {
       "name": "hw::motor.P_angle.limit",
-      "address": "0x200009FC",
+      "address": "0x200009F0",
       "type": "f32",
       "color": "#AA7C90BC",
       "value_to_write": 20.0
     },
     {
       "name": "hw::motor.Ua",
-      "address": "0x20000A88",
+      "address": "0x20000A7C",
       "type": "f32",
       "color": "#EA45F739"
     },
     {
       "name": "hw::motor.Ub",
-      "address": "0x20000A8C",
+      "address": "0x20000A80",
       "type": "f32",
       "color": "#427C7336"
     },
     {
       "name": "hw::motor.Uc",
-      "address": "0x20000A90",
+      "address": "0x20000A84",
       "type": "f32",
       "color": "#3E5542B5"
     },
     {
       "name": "hw::motor.controller",
-      "address": "0x20000951",
+      "address": "0x20000945",
       "type": "u8",
       "color": "#5FB08B67",
       "interpretation": "enum",
@@ -317,107 +317,107 @@
     },
     {
       "name": "hw::motor.current.d",
-      "address": "0x200008FC",
+      "address": "0x200008F0",
       "type": "f32",
       "color": "#B83848B2"
     },
     {
       "name": "hw::motor.current.q",
-      "address": "0x20000900",
+      "address": "0x200008F4",
       "type": "f32",
       "color": "#2CE24950"
     },
     {
       "name": "hw::motor.current_limit",
-      "address": "0x20000944",
+      "address": "0x20000938",
       "type": "f32",
       "color": "#CCCBAE3B",
       "value_to_write": 1.0
     },
     {
       "name": "hw::motor.current_sp",
-      "address": "0x200008E8",
+      "address": "0x200008DC",
       "type": "f32",
       "color": "#3C6F201D"
     },
     {
       "name": "hw::motor.electrical_angle",
-      "address": "0x200008E0",
+      "address": "0x200008D4",
       "type": "f32",
       "color": "#AD37DE96"
     },
     {
       "name": "hw::motor.modulation_centered",
-      "address": "0x2000094F",
+      "address": "0x20000943",
       "type": "i8",
       "color": "#7F61B2A8"
     },
     {
       "name": "hw::motor.shaft_angle",
-      "address": "0x200008DC",
+      "address": "0x200008D0",
       "type": "f32",
       "color": "#44AF44E2"
     },
     {
       "name": "hw::motor.shaft_angle_sp",
-      "address": "0x200008F0",
+      "address": "0x200008E4",
       "type": "f32",
       "color": "#144FC5B4"
     },
     {
       "name": "hw::motor.shaft_velocity",
-      "address": "0x200008E4",
+      "address": "0x200008D8",
       "type": "f32",
       "color": "#B18E1BC4"
     },
     {
       "name": "hw::motor.shaft_velocity_sp",
-      "address": "0x200008EC",
+      "address": "0x200008E0",
       "type": "f32",
       "color": "#964FC8E9"
     },
     {
       "name": "hw::motor.target",
-      "address": "0x200008D4",
+      "address": "0x200008C8",
       "type": "f32",
       "color": "#0A04A0D9",
       "value_to_write": 150.0
     },
     {
       "name": "hw::motor.torque_controller",
-      "address": "0x20000950",
+      "address": "0x20000944",
       "type": "u8",
       "color": "#0C986D18",
       "interpretation": "enum"
     },
     {
       "name": "hw::motor.velocity_limit",
-      "address": "0x20000948",
+      "address": "0x2000093C",
       "type": "f32",
       "color": "#67D9EE8D",
       "value_to_write": 10.0
     },
     {
       "name": "hw::motor.voltage.d",
-      "address": "0x200008F4",
+      "address": "0x200008E8",
       "type": "f32",
       "color": "#FFE71C9F"
     },
     {
       "name": "hw::motor.voltage.q",
-      "address": "0x200008F8",
+      "address": "0x200008EC",
       "type": "f32",
       "color": "#93B152CD"
     },
     {
       "name": "hw::motor.voltage_bemf",
-      "address": "0x20000904",
+      "address": "0x200008F8",
       "type": "f32",
       "color": "#57FD74B7"
     },
     {
       "name": "hw::motor.voltage_limit",
-      "address": "0x20000940",
+      "address": "0x20000934",
       "type": "f32",
       "color": "#62D46ADD",
       "value_to_write": 2.0
@@ -449,43 +449,43 @@
     },
     {
       "name": "phase_current_a",
-      "address": "0x20000770",
+      "address": "0x20000764",
       "type": "f32",
       "color": "#FFF4A261"
     },
     {
       "name": "phase_current_b",
-      "address": "0x2000076C",
+      "address": "0x20000760",
       "type": "f32",
       "color": "#FF457B9D"
     },
     {
       "name": "phase_current_c",
-      "address": "0x20000768",
+      "address": "0x2000075C",
       "type": "f32",
       "color": "#FF9B5DE5"
     },
     {
       "name": "phase_voltage_a",
-      "address": "0x20000764",
+      "address": "0x20000758",
       "type": "f32",
       "color": "#E6195EAE"
     },
     {
       "name": "phase_voltage_b",
-      "address": "0x20000760",
+      "address": "0x20000754",
       "type": "f32",
       "color": "#128945BE"
     },
     {
       "name": "phase_voltage_c",
-      "address": "0x2000075C",
+      "address": "0x20000750",
       "type": "f32",
       "color": "#FEA12843"
     },
     {
       "name": "test_commutation_state",
-      "address": "0x20000758",
+      "address": "0x2000074E",
       "type": "u8",
       "color": "#FFFFC857"
     },

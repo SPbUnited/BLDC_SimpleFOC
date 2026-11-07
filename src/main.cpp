@@ -17,8 +17,7 @@ volatile uint8_t test_commutation_state = 0;
 
 namespace
 {
-constexpr float TEST_VOLTAGE_AMPLITUDE = 24.0f;
-constexpr uint32_t TEST_PULSE_HALF_PERIOD_MS = 2000;
+constexpr float ACTIVE_PHASE_VOLTAGE = POWER_SUPPLY;
 }  // namespace
 
 void setup()
@@ -38,15 +37,6 @@ void loop()
     if (driver_init_status != 1 || current_sense_init_status != 1)
     {
         return;
-    }
-
-    static uint32_t last_toggle_ms = millis();
-    static bool pulse_high = false;
-    const uint32_t current_time_ms = millis();
-    if (current_time_ms - last_toggle_ms >= TEST_PULSE_HALF_PERIOD_MS)
-    {
-        pulse_high = !pulse_high;
-        last_toggle_ms = current_time_ms;
     }
 
     const PhaseCurrent_s currents = hw::current_sense.getPhaseCurrents();
@@ -85,9 +75,9 @@ void loop()
             break;
     }
 
-    phase_voltage_a = phase_a_active && pulse_high ? TEST_VOLTAGE_AMPLITUDE : 0.0f;
-    phase_voltage_b = phase_b_active && pulse_high ? TEST_VOLTAGE_AMPLITUDE : 0.0f;
-    phase_voltage_c = phase_c_active && pulse_high ? TEST_VOLTAGE_AMPLITUDE : 0.0f;
+    phase_voltage_a = phase_a_active ? ACTIVE_PHASE_VOLTAGE : 0.0f;
+    phase_voltage_b = phase_b_active ? ACTIVE_PHASE_VOLTAGE : 0.0f;
+    phase_voltage_c = phase_c_active ? ACTIVE_PHASE_VOLTAGE : 0.0f;
 
     hw::driver.setPwm(phase_voltage_a, phase_voltage_b, phase_voltage_c);
 }

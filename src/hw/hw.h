@@ -49,7 +49,7 @@ LowsideCurrentSense current_sense =
 
 bool init_current_sense_test()
 {
-    driver.voltage_power_supply = 24.0f;
+    driver.voltage_power_supply = POWER_SUPPLY;
     driver.voltage_limit = driver.voltage_power_supply;
     driver.pwm_frequency = 20000;
     if (!driver.init())
