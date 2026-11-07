@@ -121,7 +121,7 @@ enum CANFuocoRegisterMap
 struct CANFuocoMotorConfig
 {
     uint8_t &motor_id;
-    float get_supply_voltage(void);
+    float (*get_supply_voltage)(void) = nullptr;
     BLDCMotor &motor;
     float speed = 0;
 };
@@ -134,7 +134,7 @@ struct CANFuocoMonitorSettings
 class CANFuoco : public CANFuocoMotorConfig
 {
   private:
-    CANFuocoMonitorSettings monitor_settings;
+    CANFuocoMonitorSettings monitor_settings = {SHAFT_FEEDBACK_R};
 
     std::map<CANFuocoRegisterMap, uint8_t *> CANFuocoRegisterMapNames;
 
@@ -142,7 +142,8 @@ class CANFuoco : public CANFuocoMotorConfig
     CANFuoco(CANFuocoMotorConfig &motor_config);
 
     void can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf);
-    bool can_tx_callback(uint8_t *buf);
+    uint8_t can_tx_callback(uint8_t *buf);
+    CANFuocoRegisterMap feedback_register() const;
 };
 
 CANFuoco::CANFuoco(CANFuocoMotorConfig &motor_config) : CANFuocoMotorConfig(motor_config)
@@ -223,7 +224,10 @@ void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
             break;
 
         case MONITOR_SETTINGS_RW:
-            memcpy(&monitor_settings, buf, len);
+            if (len >= sizeof(uint8_t))
+            {
+                monitor_settings.register_to_monitor = static_cast<CANFuocoRegisterMap>(buf[0]);
+            }
             break;
 
         case TARGET_RW:
@@ -291,19 +295,21 @@ void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
 /**
  * Prepare CAN data for feedback transmission
  *
- * @return true if the feedback is OK and prepared
+ * @return Number of prepared feedback bytes, or 0 if register is unsupported
  */
-bool CANFuoco::can_tx_callback(uint8_t *buf)
+uint8_t CANFuoco::can_tx_callback(uint8_t *buf)
 {
-    size_t len = 8;
-
     switch (monitor_settings.register_to_monitor)
     {
         case SUPPLY_VOLTAGE_R:
         {
-            float supply_voltage = 13;  // get_supply_voltage();
-            memcpy(buf, &supply_voltage, len);
-            break;
+            if (get_supply_voltage == nullptr)
+            {
+                return 0;
+            }
+            float supply_voltage = get_supply_voltage();
+            memcpy(buf, &supply_voltage, sizeof(supply_voltage));
+            return sizeof(supply_voltage);
         }
 
         case TARGET_RW:
@@ -363,17 +369,31 @@ bool CANFuoco::can_tx_callback(uint8_t *buf)
         case ZERO_ELECTRIC_ANGLE_RW:
         case SENSOR_DIRECTION_RW:
         case PP_CHECK_RESULT_RW:
-            memcpy(buf, CANFuocoRegisterMapNames.at(monitor_settings.register_to_monitor), len);
-            break;
+        {
+            auto reg = monitor_settings.register_to_monitor;
+            size_t len =
+                (reg == ENABLED_RW || reg == MODULATION_CENTERED_RW || reg == PP_CHECK_RESULT_RW)
+                    ? sizeof(bool)
+                : (reg == MOTOR_STATUS_R || reg == FOC_MODULATION_RW ||
+                   reg == TORQUE_CONTROLLER_RW || reg == CONTROLLER_RW ||
+                   reg == SENSOR_DIRECTION_RW)
+                    ? sizeof(uint8_t)
+                    : sizeof(float);
+            memcpy(buf, CANFuocoRegisterMapNames.at(reg), len);
+            return len;
+        }
 
         case SHAFT_FEEDBACK_R:
             memcpy(buf, &motor.shaft_velocity, sizeof(float));
             memcpy(buf + sizeof(float), &motor.shaft_angle, sizeof(float));
-            break;
+            return 2 * sizeof(float);
 
         default:
-            return false;
+            return 0;
     }
+}
 
-    return true;
+CANFuocoRegisterMap CANFuoco::feedback_register() const
+{
+    return monitor_settings.register_to_monitor;
 }
