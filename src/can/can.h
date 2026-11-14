@@ -3,6 +3,8 @@
 #include <SimpleCan.h>
 #include <SimpleFOC.h>
 
+#include <array>
+
 #include "CAN_Fuoco.h"
 
 namespace hw
@@ -18,12 +20,20 @@ extern volatile float pcb_temp;
 namespace can
 {
 
-static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData);
+static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t* rxData);
 static void init_CAN(void);
 SimpleCan can1(/*terminateTransceiver:*/ true);
 SimpleCan::RxHandler can1RxHandler(8, handleCanMessage);
 FDCAN_TxHeaderTypeDef TxHeader;
 uint8_t TxData[8];
+struct PendingResponse
+{
+    FDCAN_TxHeaderTypeDef header;
+    uint8_t data[8];
+    uint32_t ready_at_us;
+    bool pending;
+};
+std::array<PendingResponse, 8> pending_responses{};
 
 CANFuocoMotorConfig motor_config = {
     .motor_id = motor_id,
@@ -37,7 +47,7 @@ CANFuoco can_fuoco(motor_config);
 
 static void init_CAN()
 {
-    can1.init(CanSpeed::Kbit250);
+    can1.init(CanSpeed::Mbit1);
 
     FDCAN_FilterTypeDef sFilterConfig;
 
@@ -58,7 +68,7 @@ static void init_CAN()
 }
 
 // uint32_t color = 0;
-static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
+static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t* rxData)
 {
     const uint32_t affected_id = rxHeader.Identifier >> 7;
     const uint32_t register_id = rxHeader.Identifier & 0x7F;
@@ -91,7 +101,34 @@ static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
         response_header.FDFormat = FDCAN_CLASSIC_CAN;
         response_header.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
         response_header.MessageMarker = 0;
-        can1.addMessageToTxFifoQ(&response_header, response_data);
+        for (auto& pending_response : pending_responses)
+        {
+            if (!pending_response.pending)
+            {
+                pending_response.header = response_header;
+                memcpy(pending_response.data, response_data, sizeof(pending_response.data));
+                pending_response.ready_at_us = micros() + motor_config.motor_id * 1000U;
+                pending_response.pending = true;
+                break;
+            }
+        }
+    }
+}
+
+void poll()
+{
+    for (auto& pending_response : pending_responses)
+    {
+        if (!pending_response.pending ||
+            static_cast<int32_t>(micros() - pending_response.ready_at_us) < 0)
+        {
+            continue;
+        }
+
+        if (can1.addMessageToTxFifoQ(&pending_response.header, pending_response.data) == HAL_OK)
+        {
+            pending_response.pending = false;
+        }
     }
 }
 

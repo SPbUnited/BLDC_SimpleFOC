@@ -50,6 +50,7 @@ float vbus_filter_alpha = 0.0001;
 
 void loop()
 {
+    can::poll();
     dt = micros() - last_time;
     last_time = micros();
 

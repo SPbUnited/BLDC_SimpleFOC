@@ -43,6 +43,7 @@ HAL_StatusTypeDef SimpleCan::init(CanSpeed speed)
 	init->ClockDivider = FDCAN_CLOCK_DIV1;
 	init->FrameFormat = FDCAN_FRAME_FD_BRS;
 	init->Mode = FDCAN_MODE_NORMAL;
+	// Keep pending frames queued after arbitration loss; FDCAN retries until success.
 	init->AutoRetransmission = DISABLE;
 	init->TransmitPause = ENABLE;
 	init->ProtocolException = DISABLE;
