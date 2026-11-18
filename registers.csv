@@ -23,14 +23,14 @@
 25,VOLTAGE_SENSOR_ALIGN [rw] [FLOAT32],sensor and motor align voltage parameter
 26,VELOCITY_INDEX_SEARCH [rw] [FLOAT32],target velocity for index search
 ,=== Motor physical parameters ===,
-27,PHASE_RESISTANCE [rw] [FLOAT32],"Motor phase resistance"
-28,POLE_PAIRS [rw] [INT32],"Motor pole pairs number"
-29,KV_RATING [rw] [FLOAT32],"Motor KV rating"
-30,PHASE_INDUCTANCE [rw] [FLOAT32],"Motor phase inductance"
+27,PHASE_RESISTANCE [r] [FLOAT32],"Installed motor model parameter; writes ignored"
+28,POLE_PAIRS [r] [INT32],"Installed motor model parameter; writes ignored"
+29,KV_RATING [r] [FLOAT32],"Installed motor model parameter; writes ignored"
+30,PHASE_INDUCTANCE [r] [FLOAT32],"Installed motor model parameter; writes ignored"
 ,=== Limiting variables ===,
-31,VOLTAGE_LIMIT [rw] [FLOAT32],"Voltage limiting variable"
-32,CURRENT_LIMIT [rw] [FLOAT32],"Current limiting variable"
-33,VELOCITY_LIMIT [rw] [FLOAT32],"Velocity limiting variable"
+31,VOLTAGE_LIMIT [rw] [FLOAT32],"Voltage vector limit [V], CAN value clamped to 12 V"
+32,CURRENT_LIMIT [rw] [FLOAT32],"Estimated current setpoint limit [A]; CAN range 0..4 A, default 1.3 A"
+33,VELOCITY_LIMIT [rw] [FLOAT32],"Velocity target limit [rad/s]; firmware maximum 70 rad/s"
 ,=== Motor status ===,
 34,ENABLED [rw] [BOOL],"enabled or disabled motor flag"
 35,MOTOR_STATUS [r] [FOCMotorStatus],"Motor status
@@ -52,12 +52,13 @@ enum FOCMotorStatus : uint8_t {
   Trapezoid_150      = 0x03,     "
 37,MODULATION_CENTERED [rw] [BOOL],Flag (1) centered modulation around driver limit /2  or  (0) pulled to 0
 ,=== Control mode ===,
-38,TORQUE_CONTROLLER [rw] [TorqueControlType],"enum TorqueControlType : uint8_t { 
+38,TORQUE_CONTROLLER [r] [TorqueControlType],"Firmware locks estimated_current; writes ignored. enum TorqueControlType : uint8_t {
   voltage            = 0x00,     //!< Torque control using voltage
   dc_current         = 0x01,     //!< Torque control using DC current (one current magnitude)
   foc_current        = 0x02,     //!< torque control using dq currents
+  estimated_current  = 0x03,     //!< Model-based current estimate; no measured-current feedback
 };"
-39,CONTROLLER [rw] [MotionControlType],"Режим управления мотором. При изменении обнуляет уставку
+39,CONTROLLER [r] [MotionControlType],"Firmware locks velocity control; writes ignored
 enum MotionControlType : uint8_t {
   torque            = 0x00,     //!< Torque control
   velocity          = 0x01,     //!< Velocity motion control

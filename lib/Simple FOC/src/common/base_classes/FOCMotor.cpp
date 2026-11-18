@@ -618,6 +618,7 @@ void FOCMotor::loopFOC() {
       voltage.q = current.q * phase_resistance + voltage_bemf;
       // constrain voltage within limits
       voltage.q = _constrain(voltage.q, -voltage_limit, voltage_limit) + feed_forward_voltage.q;
+      voltage.q = _constrain(voltage.q, -voltage_limit, voltage_limit);
       // d voltage  - lag compensation 
       if(_isset(axis_inductance.q)) voltage.d = _constrain( -current_sp*shaft_velocity*pole_pairs*axis_inductance.q, -voltage_limit, voltage_limit) + feed_forward_voltage.d;
       else voltage.d = feed_forward_voltage.d;

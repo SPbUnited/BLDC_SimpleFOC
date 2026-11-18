@@ -3,6 +3,7 @@
 #include <SimpleFOC.h>
 
 #include "encoders/as5048a/MagneticSensorAS5048A.h"
+#include "motor_limits.h"
 
 extern int numMotorsUsed;
 
@@ -17,9 +18,6 @@ extern int numMotorsUsed;
 
 #define WARNING_MOTOR_TEMP 75.0f
 #define WARNING_PCB_TEMP 65.0f
-
-#define NORMAL_CURRENT_LIMIT 8.0
-#define WARNING_CURRENT_LIMIT 1.0
 
 #define VBUS_WARNING_UNDERVOLT 21.0f
 #define VBUS_ERROR_UNDERVOLT 20.0f
@@ -39,7 +37,7 @@ const PinMap PinMap_SPI_SCLK[] = {
 namespace hw
 {
 
-// (Pole_pairs, resistance, kv, inductanse)
+// CubeMars specifies 3.6 ohm phase-to-phase resistance for GL35 KV100.
 BLDCMotor motor = BLDCMotor(7, 3.6, 82.5, 0.0021);
 BLDCDriver6PWM driver = BLDCDriver6PWM(PA8, PC13, PA9, PA12, PA10, PB15);
 SPIClass SPI_3(PB5, A_CAN_SHDN, A_BUTTON);
@@ -62,7 +60,7 @@ void init(bool is_warning = false)
     current_sense.skip_align = true;
     current_sense.linkDriver(&driver);
     motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
-    motor.torque_controller = TorqueControlType::voltage;
+    motor.torque_controller = TorqueControlType::estimated_current;
     // motor.monitor_variables = _MON_CURR_D | _MON_CURR_Q;
     // motor.monitor_variables = _MON_VEL;
     // motor.monitor_downsample = 300;
@@ -98,15 +96,16 @@ void init(bool is_warning = false)
     float constexpr B = 2;
     // float constexpr Kp = 0.1;
     // float constexpr Ki = Kp / Tm;
-    float constexpr Kp = 0.25;
-    float constexpr Ki = 40.0;
+    float constexpr Kp = 0.1;
+    float constexpr Ki = 5.0;
 
-    motor.current_limit = 1.0;    // [A]
-    motor.velocity_limit = 1000;  // [rad/s]
+    motor.current_limit = motor_limits::default_current_a;  // [A], model estimate
+    motor.velocity_limit = motor_limits::velocity_rad_s;    // [rad/s], reserve at 4 A
     motor.PID_velocity.P = Kp;
     motor.PID_velocity.I = Ki;
     motor.PID_velocity.D = 0.0;  // 0.0035
-    motor.PID_velocity.limit = is_warning ? WARNING_CURRENT_LIMIT : NORMAL_CURRENT_LIMIT;  // [A]
+    motor.PID_velocity.limit =
+        is_warning ? motor_limits::warning_current_a : motor_limits::default_current_a;
     motor.LPF_velocity.Tf = Tf;
 
     // motor.PID_current_d.P = 3;
@@ -120,6 +119,12 @@ void init(bool is_warning = false)
     // motor.PID_current_q.D = 0;
     motor.PID_current_q.limit = driver.voltage_power_supply;
     // motor.LPF_current_q = 0.001f;
+
+    motor.updateCurrentLimit(motor_limits::default_current_a);
+    motor.updateTorqueControlType(TorqueControlType::estimated_current);
+    motor.updateVoltageLimit(motor_limits::voltage_v);
+    motor.PID_velocity.limit =
+        is_warning ? motor_limits::warning_current_a : motor_limits::default_current_a;
 }
 
 void reinit(bool is_warning)
@@ -132,7 +137,7 @@ void reinit(bool is_warning)
     // driver.init();
     // motor.init();
     // motor.initFOC();
-    motor.PID_velocity.limit = is_warning ? WARNING_CURRENT_LIMIT : NORMAL_CURRENT_LIMIT;
+    motor.PID_velocity.limit = is_warning ? motor_limits::warning_current_a : motor.current_limit;
 }
 
 double get_motor_temp()

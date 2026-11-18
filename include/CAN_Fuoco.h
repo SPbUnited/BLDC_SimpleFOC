@@ -27,9 +27,11 @@
 
 #include <SimpleFOC.h>
 
+#include <cmath>
 #include <map>
 
 #include "half_float.h"
+#include "motor_limits.h"
 
 enum CANFuocoRegisterMap
 {
@@ -238,21 +240,11 @@ void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
             }
             break;
 
-        case TARGET_RW:
         case VOLTAGE_SENSOR_ALIGN_RW:
         case VELOCITY_INDEX_SEARCH_RW:
-        case PHASE_RESISTANCE_RW:
-        case POLE_PAIRS_RW:
-        case KV_RATING_RW:
-        case PHASE_INDUCTANCE_RW:
-        case VOLTAGE_LIMIT_RW:
-        case CURRENT_LIMIT_RW:
-        case VELOCITY_LIMIT_RW:
         case ENABLED_RW:
         case FOC_MODULATION_RW:
         case MODULATION_CENTERED_RW:
-        case TORQUE_CONTROLLER_RW:
-        case CONTROLLER_RW:
         case PID_CURRENT_D_P_RW:
         case PID_CURRENT_D_I_RW:
         case PID_CURRENT_D_D_RW:
@@ -269,7 +261,6 @@ void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
         case PID_VELOCITY_I_RW:
         case PID_VELOCITY_D_RW:
         case PID_VELOCITY_OUTPUT_RAMP_RW:
-        case PID_VELOCITY_LIMIT_RW:
         case LPF_VELOCITY_TF_RW:
         case P_ANGLE_P_RW:
         case P_ANGLE_LIMIT_RW:
@@ -284,12 +275,96 @@ void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
             break;
 
         case MULTI_TARGET_W:
-            if (1 <= motor_id && motor_id < 5)
+            if (len >= 4 * sizeof(ushort) && 1 <= motor_id && motor_id < 5)
             {
                 ushort *target_data = reinterpret_cast<ushort *>(buf);
                 speed = half_to_float(target_data[motor_id - 1]);
-                motor.target = speed;
+                if (std::isfinite(speed))
+                {
+                    motor.target = constrain(speed, -motor.velocity_limit, motor.velocity_limit);
+                }
             }
+            break;
+
+        case TARGET_RW:
+            if (len == sizeof(float))
+            {
+                float requested_target;
+                memcpy(&requested_target, buf, sizeof(requested_target));
+                if (std::isfinite(requested_target))
+                {
+                    motor.target =
+                        constrain(requested_target, -motor.velocity_limit, motor.velocity_limit);
+                }
+            }
+            break;
+
+        case VELOCITY_LIMIT_RW:
+            if (len == sizeof(float))
+            {
+                float requested_limit;
+                memcpy(&requested_limit, buf, sizeof(requested_limit));
+                if (std::isfinite(requested_limit) && requested_limit >= 0.0f)
+                {
+                    motor.updateVelocityLimit(requested_limit > motor_limits::velocity_rad_s
+                                                  ? motor_limits::velocity_rad_s
+                                                  : requested_limit);
+                    motor.target =
+                        constrain(motor.target, -motor.velocity_limit, motor.velocity_limit);
+                }
+            }
+            break;
+
+        case PID_VELOCITY_LIMIT_RW:
+            // Velocity PI output is the estimated-current setpoint.
+            motor.PID_velocity.limit = motor.current_limit;
+            break;
+
+        case CONTROLLER_RW:
+            // Keep the configured velocity controller active.
+            break;
+
+        case CURRENT_LIMIT_RW:
+            if (len == sizeof(float))
+            {
+                float requested_limit;
+                memcpy(&requested_limit, buf, sizeof(requested_limit));
+                if (std::isfinite(requested_limit) && requested_limit >= 0.0f)
+                {
+                    motor.updateCurrentLimit(requested_limit > motor_limits::maximum_current_a
+                                                 ? motor_limits::maximum_current_a
+                                                 : requested_limit);
+                    if (motor.torque_controller == TorqueControlType::estimated_current)
+                    {
+                        motor.PID_velocity.limit = motor.current_limit;
+                    }
+                }
+            }
+            break;
+
+        case VOLTAGE_LIMIT_RW:
+            if (len == sizeof(float))
+            {
+                float requested_limit;
+                memcpy(&requested_limit, buf, sizeof(requested_limit));
+                if (std::isfinite(requested_limit) && requested_limit >= 0.0f)
+                {
+                    motor.updateVoltageLimit(requested_limit > motor_limits::voltage_v
+                                                 ? motor_limits::voltage_v
+                                                 : requested_limit);
+                }
+            }
+            break;
+
+        case TORQUE_CONTROLLER_RW:
+            // Keep the model-based current limiter active; CAN cannot bypass it.
+            break;
+
+        case PHASE_RESISTANCE_RW:
+        case POLE_PAIRS_RW:
+        case KV_RATING_RW:
+        case PHASE_INDUCTANCE_RW:
+            // Motor model is fixed to the installed GL35 KV100.
             break;
 
         case SHAFT_FEEDBACK_R:

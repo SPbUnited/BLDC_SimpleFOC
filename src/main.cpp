@@ -1,6 +1,7 @@
 // #define SPI_SR_TXP
 
 #include "can/can.h"
+#include "debug/motor_tuning.h"
 #include "error/error.h"
 #include "hw/hw.h"
 #include "id/id.h"
@@ -51,6 +52,7 @@ float vbus_filter_alpha = 0.0001;
 void loop()
 {
     can::poll();
+    motor_tuning::apply(hw::motor);
     dt = micros() - last_time;
     last_time = micros();
 
@@ -99,6 +101,22 @@ void loop()
             led::set_blink_led(led::RED, led::YELLOW, 1000 * current_errors, 0.5);
         }
     }
+    else if (motor_tuning::owns_control())
+    {
+        const bool motor_failed = hw::motor.motor_status == FOCMotorStatus::motor_init_failed ||
+                                  hw::motor.motor_status == FOCMotorStatus::motor_calib_failed ||
+                                  hw::motor.motor_status == FOCMotorStatus::motor_error;
+        const bool temperature_failed =
+            !hw::is_pcb_temp_ok(pcb_temp) || !hw::is_motor_temp_ok(motor_temp);
+        if (motor_failed || temperature_failed || hw::is_vbus_undervolt_error(vbus))
+        {
+            hw::foc_abort();
+        }
+        else
+        {
+            hw::foc_loop();
+        }
+    }
     else
     {
         static uint32_t timer1 = 0;
@@ -122,5 +140,6 @@ void loop()
         }
     }
 
+    motor_tuning::capture(hw::motor);
     led::tick();
 }
