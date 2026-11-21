@@ -140,23 +140,15 @@ uint32_t color = 0;
 bool start = false;
 static void handleCanMessage(FDCAN_RxHeaderTypeDef rxHeader, uint8_t *rxData)
 {
-
-  // if (rxHeader.Identifier == 0x40)
-  // {
-  // digitalToggle(PB13);
-  // if (rxHeader.Identifier == 0x70A)
-  // {
-
-  // }
-  if ((rxHeader.Identifier >> 8) == motor_id)
+  const uint32_t affected_id = rxHeader.Identifier >> 7;
+  const uint32_t register_id = rxHeader.Identifier & 0x7F;
+  if (affected_id == motor_id)
   {
-    // digitalToggle(PB13);
     color += 1;
     if (color % 100 == 0)
       digitalToggle(PB13);
-    can_fuoco.can_rx_callback(rxHeader.Identifier & 0xFF, rxHeader.DataLength, rxData);
+    can_fuoco.can_rx_callback(register_id, rxHeader.DataLength, rxData);
   }
-  // }
 }
 
 void send_message()

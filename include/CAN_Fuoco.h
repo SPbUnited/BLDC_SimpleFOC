@@ -199,9 +199,10 @@ void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
     switch (id)
     {
     default:
+        break;
+
     case EMERGENCY_STOP_W:
         motor.disable();
-        delay(15000);
         break;
 
     case MONITOR_SETTINGS_RW:
