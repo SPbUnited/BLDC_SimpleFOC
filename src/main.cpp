@@ -118,7 +118,7 @@ CANFuoco can_fuoco(motor_config);
 
 static void init_CAN()
 {
-  can1.init(CanSpeed::Kbit250);
+  can1.init(CanSpeed::Kbit500);
 
   FDCAN_FilterTypeDef sFilterConfig;
 
