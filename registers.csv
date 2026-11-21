@@ -1,6 +1,6 @@
-0,EMERGENCY_STOP [w],Аварийный останов. При записи любого значения драйвер полностью обесточивает электропривод на 15 секунд
-1,SUPPLY_VOLTAGE [r],Напряжение питания
-4,MONITOR_SETTINGS [rw],"Настройка мониторинга. Значение регистра указывает на то, какой регистр будет отправлятся в обратной связи от драйвера"
+0,EMERGENCY_STOP [w] [ANY],Аварийный останов. При записи любого значения драйвер полностью обесточивает электропривод
+1,SUPPLY_VOLTAGE [r] [FLOAT32],Напряжение питания
+4,MONITOR_SETTINGS [w] [UINT8]x4,"Настройка мониторинга. До четырёх байтов с номерами регистров. Для подготовки ответа регистры перебираются циклически, нули пропускаются."
 -,-,-
 ,===== SimpleFOC =====,
 ,=== State variables ===,
@@ -23,14 +23,14 @@
 25,VOLTAGE_SENSOR_ALIGN [rw] [FLOAT32],sensor and motor align voltage parameter
 26,VELOCITY_INDEX_SEARCH [rw] [FLOAT32],target velocity for index search
 ,=== Motor physical parameters ===,
-27,PHASE_RESISTANCE [rw] [FLOAT32],"Motor phase resistance"
-28,POLE_PAIRS [rw] [INT32],"Motor pole pairs number"
-29,KV_RATING [rw] [FLOAT32],"Motor KV rating"
-30,PHASE_INDUCTANCE [rw] [FLOAT32],"Motor phase inductance"
+27,PHASE_RESISTANCE [r] [FLOAT32],"Installed motor model parameter; writes ignored"
+28,POLE_PAIRS [r] [INT32],"Installed motor model parameter; writes ignored"
+29,KV_RATING [r] [FLOAT32],"Installed motor model parameter; writes ignored"
+30,PHASE_INDUCTANCE [r] [FLOAT32],"Installed motor model parameter; writes ignored"
 ,=== Limiting variables ===,
-31,VOLTAGE_LIMIT [rw] [FLOAT32],"Voltage limiting variable"
-32,CURRENT_LIMIT [rw] [FLOAT32],"Current limiting variable"
-33,VELOCITY_LIMIT [rw] [FLOAT32],"Velocity limiting variable"
+31,VOLTAGE_LIMIT [rw] [FLOAT32],"Voltage vector limit [V], CAN value clamped to 8 V"
+32,CURRENT_LIMIT [rw] [FLOAT32],"Current limit setting [A], CAN range 0..2 A"
+33,VELOCITY_LIMIT [rw] [FLOAT32],"Velocity target limit [rad/s]; firmware maximum 10000 rad/s"
 ,=== Motor status ===,
 34,ENABLED [rw] [BOOL],"enabled or disabled motor flag"
 35,MOTOR_STATUS [r] [FOCMotorStatus],"Motor status
@@ -52,12 +52,13 @@ enum FOCMotorStatus : uint8_t {
   Trapezoid_150      = 0x03,     "
 37,MODULATION_CENTERED [rw] [BOOL],Flag (1) centered modulation around driver limit /2  or  (0) pulled to 0
 ,=== Control mode ===,
-38,TORQUE_CONTROLLER [rw] [TorqueControlType],"enum TorqueControlType : uint8_t { 
+38,TORQUE_CONTROLLER [r] [TorqueControlType],"Firmware locks voltage torque control; writes ignored. enum TorqueControlType : uint8_t {
   voltage            = 0x00,     //!< Torque control using voltage
   dc_current         = 0x01,     //!< Torque control using DC current (one current magnitude)
   foc_current        = 0x02,     //!< torque control using dq currents
+  estimated_current  = 0x03,     //!< Model-based current estimate; no measured-current feedback
 };"
-39,CONTROLLER [rw] [MotionControlType],"Режим управления мотором. При изменении обнуляет уставку
+39,CONTROLLER [r] [MotionControlType],"Firmware locks velocity control; writes ignored
 enum MotionControlType : uint8_t {
   torque            = 0x00,     //!< Torque control
   velocity          = 0x01,     //!< Velocity motion control
@@ -67,35 +68,45 @@ enum MotionControlType : uint8_t {
 };"
 -,-,-
 ,=== Controller and low pass filter settings ===,
-40,PID_CURRENT_D_P [rw],
-41,PID_CURRENT_D_I [rw],
-42,PID_CURRENT_D_D [rw],
-43,LPF_CURRENT_D [rw],
+40,PID_CURRENT_D_P [rw] [FLOAT32],
+41,PID_CURRENT_D_I [rw] [fFLOAT32],
+42,PID_CURRENT_D_D [rw] [fFLOAT32],
+43,PID_CURRENT_D_OUTPUT_RAMP [rw] [FLOAT32],
+44,PID_CURRENT_D_LIMIT [rw] [FLOAT32],
+45,LPF_CURRENT_D_TF [rw] [fFLOAT32],
 -,-,-
-45,PID_CURRENT_Q_P [rw],
-46,PID_CURRENT_Q_I [rw],
-47,PID_CURRENT_Q_D [rw],
-48,LPF_CURRENT_Q [rw],
+46,PID_CURRENT_Q_P [rw] [fFLOAT32],
+47,PID_CURRENT_Q_I [rw] [fFLOAT32],
+48,PID_CURRENT_Q_D [rw] [fFLOAT32],
+49,PID_CURRENT_Q_OUTPUT_RAMP [rw] [FLOAT32],
+50,PID_CURRENT_Q_LIMIT [rw] [FLOAT32],
+51,LPF_CURRENT_Q_TF [rw] [fFLOAT32],
 -,-,-
-50,PID_VELOCITY_P [rw],
-51,PID_VELOCITY_I [rw],
-52,PID_VELOCITY_D [rw],
-53,LPF_VELOCITY [rw],
+52,PID_VELOCITY_P [rw] [fFLOAT32],
+53,PID_VELOCITY_I [rw] [fFLOAT32],
+54,PID_VELOCITY_D [rw] [fFLOAT32],
+55,PID_VELOCITY_OUTPUT_RAMP [rw] [FLOAT32],
+56,PID_VELOCITY_LIMIT [rw] [FLOAT32],
+57,LPF_VELOCITY_TF [rw] [fFLOAT32],
 -,-,-
-55,P_ANGLE_P [rw],
-56,LPF_ANGLE [rw],
+58,P_ANGLE_P [rw] [fFLOAT32],
+59,P_ANGLE_LIMIT [rw] [FLOAT32],
+60,LPF_ANGLE_TF [rw] [fFLOAT32],
 -,,
-58,MOTION_DOWNSAMPLE [rw] [UINT32],
-59,MOTION_CNT [rw] [UINT32],
+61,MOTION_DOWNSAMPLE [rw] [UINT32],
+62,MOTION_CNT [rw] [UINT32],
 -,,
 ,=== Sensor settings ===,
-60,SENSOR_OFFSET [rw] [FLOAT32],
-61,ZERO_ELECTRIC_ANGLE [rw] [FLOAT32],
-62,SENSOR_DIRECTION [rw] [Direction],
-63,PP_CHECK_RESULT [rw] [BOOL],
+63,SENSOR_OFFSET [rw] [FLOAT32],
+64,ZERO_ELECTRIC_ANGLE [rw] [FLOAT32],
+65,SENSOR_DIRECTION [rw] [Direction],
+66,PP_CHECK_RESULT [rw] [BOOL],
 -,-,-
 ,===== Virtual registers =====,
-64,MULTI_TARGET [w] [FLOAT16]x4,"Текущая уставка. Используется в комбинации с широковещательными пакетами, чтобы выставить уставку на 4 мотора сразу. Содержит 4 числа FLOAT16. Актуальное значение уставки определяется исходя из ID мотора"
-96,SHAFT_FEEDBACK [r] [FLOAT32]x2,"Значения SHAFT_VELOCITY и SHAFT_ANGLE"
+96,MULTI_TARGET [w] [FLOAT16]x4,"Текущая уставка. EC-max обрабатывает адресный кадр для ID 1–4. Содержит 4 числа FLOAT16. Актуальное значение уставки определяется исходя из ID мотора"
+102,SHAFT_FEEDBACK [r] [FLOAT32]x2,"Значения SHAFT_VELOCITY и SHAFT_ANGLE"
+103,PCB_TEMPERATURE [r] [FLOAT32],Температура платы драйвера в градусах Цельсия
+104,MOTOR_TEMPERATURE [r] [FLOAT32],Температура мотора в градусах Цельсия
 
-127,SAVE_TO_EEPROM [w],"При записи любого значения сохраняет текущие параметры настройки мотора в энергонезависимую память, откуда они будут восстановлены при следующем перезапуске"
+127,SAVE_TO_EEPROM [w] [VOID],"При записи любого значения сохраняет текущие параметры настройки мотора в энергонезависимую память, откуда они будут восстановлены при следующем перезапуске
+NOT IMPLEMENTED"

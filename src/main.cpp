@@ -11,7 +11,9 @@ uint8_t TxData[8];
 
 #include "encoders/MXLEMMING_observer/MXLEMMINGObserverSensor.h"
 
-float max_current = 2.0;
+float get_vbus();
+double get_motor_temp();
+float get_pcm_temp();
 // (Pole_pairs, resistance, kv, inductanse)
 BLDCMotor motor = BLDCMotor(1, 0.94, 770, 0.104 * 0.001);
 uint32_t last_receive_timer = 0;
@@ -29,7 +31,9 @@ bool motor_disabled = false;
 uint8_t motor_id = 0;
 CANFuocoMotorConfig motor_config = {
     .motor_id = motor_id,
-    // .get_supply_voltage = get_vbus,
+    .get_supply_voltage = get_vbus,
+    .get_pcb_temperature = get_pcm_temp,
+    .get_motor_temperature = []() { return static_cast<float>(get_motor_temp()); },
     .motor = motor,
 };
 
@@ -42,7 +46,7 @@ void setup()
   // driver config
   // power supply voltage [V]
   driver.voltage_power_supply = 24.0;
-  driver.voltage_limit = 8.0;
+  driver.voltage_limit = motor_limits::voltage_v;
   driver.pwm_frequency = 14000;
   driver.init();
 
@@ -56,8 +60,8 @@ void setup()
   // motor.LPF_current_d.Tf = 0.01;
   // motor.LPF_current_q.Tf = 0.01;
   // motor.voltage_limit = 12;   // [V]
-  motor.current_limit = max_current;
-  motor.velocity_limit = 10000; // [rad/s]
+  motor.current_limit = motor_limits::maximum_current_a;
+  motor.velocity_limit = motor_limits::velocity_rad_s; // [rad/s]
   // default P=0.5 I = 10 D = 0
   motor.PID_velocity.P = 0.01;
   motor.PID_velocity.I = 0.01;

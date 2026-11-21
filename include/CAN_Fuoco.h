@@ -26,8 +26,12 @@
  */
 
 #include <SimpleFOC.h>
+
+#include <cmath>
 #include <map>
+
 #include "half_float.h"
+#include "motor_limits.h"
 
 enum CANFuocoRegisterMap
 {
@@ -83,61 +87,74 @@ enum CANFuocoRegisterMap
     PID_CURRENT_D_P_RW = 40,
     PID_CURRENT_D_I_RW = 41,
     PID_CURRENT_D_D_RW = 42,
-    LPF_CURRENT_D_RW = 43,
-    PID_CURRENT_Q_P_RW = 45,
-    PID_CURRENT_Q_I_RW = 46,
-    PID_CURRENT_Q_D_RW = 47,
-    LPF_CURRENT_Q_RW = 48,
-    PID_VELOCITY_P_RW = 50,
-    PID_VELOCITY_I_RW = 51,
-    PID_VELOCITY_D_RW = 52,
-    LPF_VELOCITY_RW = 53,
-    P_ANGLE_P_RW = 55,
-    LPF_ANGLE_RW = 56,
-    MOTION_DOWNSAMPLE_RW = 58,
-    MOTION_CNT_RW = 59,
+    PID_CURREND_D_OUTPUT_RAMP_RW = 43,
+    PID_CURRENT_D_LIMIT_RW = 44,
+    LPF_CURRENT_D_TF_RW = 45,
+    PID_CURRENT_Q_P_RW = 46,
+    PID_CURRENT_Q_I_RW = 47,
+    PID_CURRENT_Q_D_RW = 48,
+    PID_CURRENT_Q_OUTPUT_RAMP_RW = 49,
+    PID_CURRENT_Q_LIMIT_RW = 50,
+    LPF_CURRENT_Q_TF_RW = 51,
+    PID_VELOCITY_P_RW = 52,
+    PID_VELOCITY_I_RW = 53,
+    PID_VELOCITY_D_RW = 54,
+    PID_VELOCITY_OUTPUT_RAMP_RW = 55,
+    PID_VELOCITY_LIMIT_RW = 56,
+    LPF_VELOCITY_TF_RW = 57,
+    P_ANGLE_P_RW = 58,
+    P_ANGLE_LIMIT_RW = 59,
+    LPF_ANGLE_TF_RW = 60,
+    MOTION_DOWNSAMPLE_RW = 61,
+    MOTION_CNT_RW = 62,
 
     // Sensor settings
-    SENSOR_OFFSET_RW = 60,
-    ZERO_ELECTRIC_ANGLE_RW = 61,
-    SENSOR_DIRECTION_RW = 62,
-    PP_CHECK_RESULT_RW = 63,
+    SENSOR_OFFSET_RW = 63,
+    ZERO_ELECTRIC_ANGLE_RW = 64,
+    SENSOR_DIRECTION_RW = 65,
+    PP_CHECK_RESULT_RW = 66,
 
     // Virtual registers
-    MULTI_TARGET_W = 64,
-    SHAFT_FEEDBACK_R = 96,
+    MULTI_TARGET_W = 96,
+    SHAFT_FEEDBACK_R = 102,
+    PCB_TEMPERATURE_R = 103,
+    MOTOR_TEMPERATURE_R = 104,
     SAVE_TO_EEPROM_W = 127,
 };
 
 struct CANFuocoMotorConfig
 {
-    uint8_t& motor_id;
-    float get_supply_voltage(void);
+    uint8_t &motor_id;
+    float (*get_supply_voltage)(void) = nullptr;
+    float (*get_pcb_temperature)(void) = nullptr;
+    float (*get_motor_temperature)(void) = nullptr;
     BLDCMotor &motor;
     float speed = 0;
 };
 
 struct CANFuocoMonitorSettings
 {
-    CANFuocoRegisterMap register_to_monitor;
+    uint8_t registers[4] = {SHAFT_FEEDBACK_R, 0, 0, 0};
 };
 
 class CANFuoco : public CANFuocoMotorConfig
 {
-private:
+  private:
     CANFuocoMonitorSettings monitor_settings;
+    uint8_t monitor_index = 0;
+    CANFuocoRegisterMap active_feedback_register = SHAFT_FEEDBACK_R;
 
     std::map<CANFuocoRegisterMap, uint8_t *> CANFuocoRegisterMapNames;
 
-public:
+  public:
     CANFuoco(CANFuocoMotorConfig &motor_config);
 
     void can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf);
-    bool can_tx_callback(uint8_t *buf);
+    uint8_t can_tx_callback(uint8_t *buf);
+    CANFuocoRegisterMap feedback_register() const;
 };
 
-CANFuoco::CANFuoco(
-    CANFuocoMotorConfig &motor_config) : CANFuocoMotorConfig(motor_config)
+CANFuoco::CANFuoco(CANFuocoMotorConfig &motor_config) : CANFuocoMotorConfig(motor_config)
 {
     CANFuocoRegisterMapNames = std::map<CANFuocoRegisterMap, uint8_t *>{
         {TARGET_RW, reinterpret_cast<uint8_t *>(&motor.target)},
@@ -173,17 +190,27 @@ CANFuoco::CANFuoco(
         {PID_CURRENT_D_P_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.P)},
         {PID_CURRENT_D_I_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.I)},
         {PID_CURRENT_D_D_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.D)},
-        {LPF_CURRENT_D_RW, reinterpret_cast<uint8_t *>(&motor.LPF_current_d.Tf)},
+        {PID_CURREND_D_OUTPUT_RAMP_RW,
+         reinterpret_cast<uint8_t *>(&motor.PID_current_d.output_ramp)},
+        {PID_CURRENT_D_LIMIT_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_d.limit)},
+        {LPF_CURRENT_D_TF_RW, reinterpret_cast<uint8_t *>(&motor.LPF_current_d.Tf)},
         {PID_CURRENT_Q_P_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.P)},
         {PID_CURRENT_Q_I_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.I)},
         {PID_CURRENT_Q_D_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.D)},
-        {LPF_CURRENT_Q_RW, reinterpret_cast<uint8_t *>(&motor.LPF_current_q.Tf)},
+        {PID_CURRENT_Q_OUTPUT_RAMP_RW,
+         reinterpret_cast<uint8_t *>(&motor.PID_current_q.output_ramp)},
+        {PID_CURRENT_Q_LIMIT_RW, reinterpret_cast<uint8_t *>(&motor.PID_current_q.limit)},
+        {LPF_CURRENT_Q_TF_RW, reinterpret_cast<uint8_t *>(&motor.LPF_current_q.Tf)},
         {PID_VELOCITY_P_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.P)},
         {PID_VELOCITY_I_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.I)},
         {PID_VELOCITY_D_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.D)},
-        {LPF_VELOCITY_RW, reinterpret_cast<uint8_t *>(&motor.LPF_velocity.Tf)},
+        {PID_VELOCITY_OUTPUT_RAMP_RW,
+         reinterpret_cast<uint8_t *>(&motor.PID_velocity.output_ramp)},
+        {PID_VELOCITY_LIMIT_RW, reinterpret_cast<uint8_t *>(&motor.PID_velocity.limit)},
+        {LPF_VELOCITY_TF_RW, reinterpret_cast<uint8_t *>(&motor.LPF_velocity.Tf)},
         {P_ANGLE_P_RW, reinterpret_cast<uint8_t *>(&motor.P_angle.P)},
-        {LPF_ANGLE_RW, reinterpret_cast<uint8_t *>(&motor.LPF_angle.Tf)},
+        {P_ANGLE_LIMIT_RW, reinterpret_cast<uint8_t *>(&motor.P_angle.limit)},
+        {LPF_ANGLE_TF_RW, reinterpret_cast<uint8_t *>(&motor.LPF_angle.Tf)},
         {MOTION_DOWNSAMPLE_RW, reinterpret_cast<uint8_t *>(&motor.motion_downsample)},
         {MOTION_CNT_RW, reinterpret_cast<uint8_t *>(&motor.motion_cnt)},
         {SENSOR_OFFSET_RW, reinterpret_cast<uint8_t *>(&motor.sensor_offset)},
@@ -198,152 +225,289 @@ void CANFuoco::can_rx_callback(uint32_t m_id, size_t len, uint8_t *buf)
     CANFuocoRegisterMap id = static_cast<CANFuocoRegisterMap>(m_id);
     switch (id)
     {
-    default:
-        break;
+        default:
+        case EMERGENCY_STOP_W:
+            motor.disable();
+            delay(15000);
+            break;
 
-    case EMERGENCY_STOP_W:
-        motor.disable();
-        break;
+        case MONITOR_SETTINGS_RW:
+            if (len >= 1 && len <= sizeof(monitor_settings.registers))
+            {
+                memset(monitor_settings.registers, 0, sizeof(monitor_settings.registers));
+                memcpy(monitor_settings.registers, buf, len);
+                monitor_index = 0;
+            }
+            break;
 
-    case MONITOR_SETTINGS_RW:
-        memcpy(&monitor_settings, buf, len);
-        break;
+        case VOLTAGE_SENSOR_ALIGN_RW:
+        case VELOCITY_INDEX_SEARCH_RW:
+        case ENABLED_RW:
+        case FOC_MODULATION_RW:
+        case MODULATION_CENTERED_RW:
+        case PID_CURRENT_D_P_RW:
+        case PID_CURRENT_D_I_RW:
+        case PID_CURRENT_D_D_RW:
+        case PID_CURREND_D_OUTPUT_RAMP_RW:
+        case PID_CURRENT_D_LIMIT_RW:
+        case LPF_CURRENT_D_TF_RW:
+        case PID_CURRENT_Q_P_RW:
+        case PID_CURRENT_Q_I_RW:
+        case PID_CURRENT_Q_D_RW:
+        case PID_CURRENT_Q_OUTPUT_RAMP_RW:
+        case PID_CURRENT_Q_LIMIT_RW:
+        case LPF_CURRENT_Q_TF_RW:
+        case PID_VELOCITY_P_RW:
+        case PID_VELOCITY_I_RW:
+        case PID_VELOCITY_D_RW:
+        case PID_VELOCITY_OUTPUT_RAMP_RW:
+        case LPF_VELOCITY_TF_RW:
+        case P_ANGLE_P_RW:
+        case P_ANGLE_LIMIT_RW:
+        case LPF_ANGLE_TF_RW:
+        case MOTION_DOWNSAMPLE_RW:
+        case MOTION_CNT_RW:
+        case SENSOR_OFFSET_RW:
+        case ZERO_ELECTRIC_ANGLE_RW:
+        case SENSOR_DIRECTION_RW:
+        case PP_CHECK_RESULT_RW:
+            memcpy(CANFuocoRegisterMapNames.at(id), buf, len);
+            break;
 
-    case TARGET_RW:
-    case VOLTAGE_SENSOR_ALIGN_RW:
-    case VELOCITY_INDEX_SEARCH_RW:
-    case PHASE_RESISTANCE_RW:
-    case POLE_PAIRS_RW:
-    case KV_RATING_RW:
-    case PHASE_INDUCTANCE_RW:
-    case VOLTAGE_LIMIT_RW:
-    case CURRENT_LIMIT_RW:
-    case VELOCITY_LIMIT_RW:
-    case ENABLED_RW:
-    case FOC_MODULATION_RW:
-    case MODULATION_CENTERED_RW:
-    case TORQUE_CONTROLLER_RW:
-    case CONTROLLER_RW:
-    case PID_CURRENT_D_P_RW:
-    case PID_CURRENT_D_I_RW:
-    case PID_CURRENT_D_D_RW:
-    case LPF_CURRENT_D_RW:
-    case PID_CURRENT_Q_P_RW:
-    case PID_CURRENT_Q_I_RW:
-    case PID_CURRENT_Q_D_RW:
-    case LPF_CURRENT_Q_RW:
-    case PID_VELOCITY_P_RW:
-    case PID_VELOCITY_I_RW:
-    case PID_VELOCITY_D_RW:
-    case LPF_VELOCITY_RW:
-    case P_ANGLE_P_RW:
-    case LPF_ANGLE_RW:
-    case MOTION_DOWNSAMPLE_RW:
-    case MOTION_CNT_RW:
-    case SENSOR_OFFSET_RW:
-    case ZERO_ELECTRIC_ANGLE_RW:
-    case SENSOR_DIRECTION_RW:
-    case PP_CHECK_RESULT_RW:
-        memcpy(CANFuocoRegisterMapNames.at(id), buf, len);
-        break;
+        case MULTI_TARGET_W:
+            if (len >= 4 * sizeof(ushort) && 1 <= motor_id && motor_id < 5)
+            {
+                ushort *target_data = reinterpret_cast<ushort *>(buf);
+                speed = half_to_float(target_data[motor_id - 1]);
+                if (std::isfinite(speed))
+                {
+                    motor.target = constrain(speed, -motor.velocity_limit, motor.velocity_limit);
+                }
+            }
+            break;
 
-    case MULTI_TARGET_W:
-        if (1 <= motor_id && motor_id < 5)
-        {
-            ushort *target_data = reinterpret_cast<ushort *>(buf);
-            speed = half_to_float(target_data[motor_id - 1]);
-            motor.target = speed;
-            // motor.move(half_to_float(target_data[motor_id - 1]));
-        }
-        break;
+        case TARGET_RW:
+            if (len == sizeof(float))
+            {
+                float requested_target;
+                memcpy(&requested_target, buf, sizeof(requested_target));
+                if (std::isfinite(requested_target))
+                {
+                    motor.target =
+                        constrain(requested_target, -motor.velocity_limit, motor.velocity_limit);
+                }
+            }
+            break;
 
-    case SHAFT_FEEDBACK_R:
-        break;
+        case VELOCITY_LIMIT_RW:
+            if (len == sizeof(float))
+            {
+                float requested_limit;
+                memcpy(&requested_limit, buf, sizeof(requested_limit));
+                if (std::isfinite(requested_limit) && requested_limit >= 0.0f)
+                {
+                    motor.updateVelocityLimit(requested_limit > motor_limits::velocity_rad_s
+                                                  ? motor_limits::velocity_rad_s
+                                                  : requested_limit);
+                    motor.target =
+                        constrain(motor.target, -motor.velocity_limit, motor.velocity_limit);
+                }
+            }
+            break;
 
-    case SAVE_TO_EEPROM_W:
-        break;
+        case PID_VELOCITY_LIMIT_RW:
+            // Velocity PI output is the estimated-current setpoint.
+            motor.PID_velocity.limit = motor.current_limit;
+            break;
+
+        case CONTROLLER_RW:
+            // Keep the configured velocity controller active.
+            break;
+
+        case CURRENT_LIMIT_RW:
+            if (len == sizeof(float))
+            {
+                float requested_limit;
+                memcpy(&requested_limit, buf, sizeof(requested_limit));
+                if (std::isfinite(requested_limit) && requested_limit >= 0.0f)
+                {
+                    motor.updateCurrentLimit(requested_limit > motor_limits::maximum_current_a
+                                                 ? motor_limits::maximum_current_a
+                                                 : requested_limit);
+                    if (motor.torque_controller == TorqueControlType::estimated_current)
+                    {
+                        motor.PID_velocity.limit = motor.current_limit;
+                    }
+                }
+            }
+            break;
+
+        case VOLTAGE_LIMIT_RW:
+            if (len == sizeof(float))
+            {
+                float requested_limit;
+                memcpy(&requested_limit, buf, sizeof(requested_limit));
+                if (std::isfinite(requested_limit) && requested_limit >= 0.0f)
+                {
+                    motor.updateVoltageLimit(requested_limit > motor_limits::voltage_v
+                                                 ? motor_limits::voltage_v
+                                                 : requested_limit);
+                }
+            }
+            break;
+
+        case TORQUE_CONTROLLER_RW:
+            // Keep the model-based current limiter active; CAN cannot bypass it.
+            break;
+
+        case PHASE_RESISTANCE_RW:
+        case POLE_PAIRS_RW:
+        case KV_RATING_RW:
+        case PHASE_INDUCTANCE_RW:
+            // Motor model is fixed to the installed GL35 KV100.
+            break;
+
+        case SHAFT_FEEDBACK_R:
+            break;
+
+        case SAVE_TO_EEPROM_W:
+            break;
     }
 }
 
 /**
  * Prepare CAN data for feedback transmission
  *
- * @return true if the feedback is OK and prepared
+ * @return Number of prepared feedback bytes, or 0 if register is unsupported
  */
-bool CANFuoco::can_tx_callback(uint8_t *buf)
+uint8_t CANFuoco::can_tx_callback(uint8_t *buf)
 {
-    size_t len = 8;
-
-    switch (monitor_settings.register_to_monitor)
+    for (uint8_t checked = 0; checked < 4; ++checked)
     {
-    case SUPPLY_VOLTAGE_R:
-    {
-        float supply_voltage = 13; //get_supply_voltage();
-        memcpy(buf, &supply_voltage, len);
-        break;
+        const auto reg =
+            static_cast<CANFuocoRegisterMap>(monitor_settings.registers[monitor_index]);
+        monitor_index = (monitor_index + 1) % 4;
+        if (reg != EMERGENCY_STOP_W)
+        {
+            active_feedback_register = reg;
+            break;
+        }
+        if (checked == 3)
+        {
+            return 0;
+        }
     }
 
-    case TARGET_RW:
-    case FEED_FORWARD_VELOCITY_R:
-    case SHAFT_ANGLE_R:
-    case ELECTRICAL_ANGLE_R:
-    case SHAFT_VELOCITY_R:
-    case CURRENT_SP_R:
-    case SHAFT_VELOCITY_SP_R:
-    case SHAFT_ANGLE_SP_R:
-    case VOLTAGE_D_R:
-    case VOLTAGE_Q_R:
-    case CURRENT_D_R:
-    case CURRENT_Q_R:
-    case VOLTAGE_BEMF_R:
-    case U_ALPHA_R:
-    case U_BETA_R:
-    case VOLTAGE_SENSOR_ALIGN_RW:
-    case VELOCITY_INDEX_SEARCH_RW:
-    case PHASE_RESISTANCE_RW:
-    case POLE_PAIRS_RW:
-    case KV_RATING_RW:
-    case PHASE_INDUCTANCE_RW:
-    case VOLTAGE_LIMIT_RW:
-    case CURRENT_LIMIT_RW:
-    case VELOCITY_LIMIT_RW:
-    case ENABLED_RW:
-    case MOTOR_STATUS_R:
-    case FOC_MODULATION_RW:
-    case MODULATION_CENTERED_RW:
-    case TORQUE_CONTROLLER_RW:
-    case CONTROLLER_RW:
-    case PID_CURRENT_D_P_RW:
-    case PID_CURRENT_D_I_RW:
-    case PID_CURRENT_D_D_RW:
-    case LPF_CURRENT_D_RW:
-    case PID_CURRENT_Q_P_RW:
-    case PID_CURRENT_Q_I_RW:
-    case PID_CURRENT_Q_D_RW:
-    case LPF_CURRENT_Q_RW:
-    case PID_VELOCITY_P_RW:
-    case PID_VELOCITY_I_RW:
-    case PID_VELOCITY_D_RW:
-    case LPF_VELOCITY_RW:
-    case P_ANGLE_P_RW:
-    case LPF_ANGLE_RW:
-    case MOTION_DOWNSAMPLE_RW:
-    case MOTION_CNT_RW:
-    case SENSOR_OFFSET_RW:
-    case ZERO_ELECTRIC_ANGLE_RW:
-    case SENSOR_DIRECTION_RW:
-    case PP_CHECK_RESULT_RW:
-        memcpy(buf, CANFuocoRegisterMapNames.at(monitor_settings.register_to_monitor), len);
-        break;
+    switch (active_feedback_register)
+    {
+        case SUPPLY_VOLTAGE_R:
+        {
+            if (get_supply_voltage == nullptr)
+            {
+                return 0;
+            }
+            float supply_voltage = get_supply_voltage();
+            memcpy(buf, &supply_voltage, sizeof(supply_voltage));
+            return sizeof(supply_voltage);
+        }
 
-    case SHAFT_FEEDBACK_R:
-        memcpy(buf, &motor.shaft_velocity, sizeof(float));
-        memcpy(buf + sizeof(float), &motor.shaft_angle, sizeof(float));
-        break;
+        case PCB_TEMPERATURE_R:
+        case MOTOR_TEMPERATURE_R:
+        {
+            auto get_temperature = active_feedback_register == PCB_TEMPERATURE_R
+                                       ? get_pcb_temperature
+                                       : get_motor_temperature;
+            if (get_temperature == nullptr)
+            {
+                return 0;
+            }
+            const float temperature = get_temperature();
+            memcpy(buf, &temperature, sizeof(temperature));
+            return sizeof(temperature);
+        }
 
-    default:
-        return false;
+        case TARGET_RW:
+        case FEED_FORWARD_VELOCITY_R:
+        case SHAFT_ANGLE_R:
+        case ELECTRICAL_ANGLE_R:
+        case SHAFT_VELOCITY_R:
+        case CURRENT_SP_R:
+        case SHAFT_VELOCITY_SP_R:
+        case SHAFT_ANGLE_SP_R:
+        case VOLTAGE_D_R:
+        case VOLTAGE_Q_R:
+        case CURRENT_D_R:
+        case CURRENT_Q_R:
+        case VOLTAGE_BEMF_R:
+        case U_ALPHA_R:
+        case U_BETA_R:
+        case VOLTAGE_SENSOR_ALIGN_RW:
+        case VELOCITY_INDEX_SEARCH_RW:
+        case PHASE_RESISTANCE_RW:
+        case POLE_PAIRS_RW:
+        case KV_RATING_RW:
+        case PHASE_INDUCTANCE_RW:
+        case VOLTAGE_LIMIT_RW:
+        case CURRENT_LIMIT_RW:
+        case VELOCITY_LIMIT_RW:
+        case ENABLED_RW:
+        case MOTOR_STATUS_R:
+        case FOC_MODULATION_RW:
+        case MODULATION_CENTERED_RW:
+        case TORQUE_CONTROLLER_RW:
+        case CONTROLLER_RW:
+        case PID_CURRENT_D_P_RW:
+        case PID_CURRENT_D_I_RW:
+        case PID_CURRENT_D_D_RW:
+        case PID_CURREND_D_OUTPUT_RAMP_RW:
+        case PID_CURRENT_D_LIMIT_RW:
+        case LPF_CURRENT_D_TF_RW:
+        case PID_CURRENT_Q_P_RW:
+        case PID_CURRENT_Q_I_RW:
+        case PID_CURRENT_Q_D_RW:
+        case PID_CURRENT_Q_OUTPUT_RAMP_RW:
+        case PID_CURRENT_Q_LIMIT_RW:
+        case LPF_CURRENT_Q_TF_RW:
+        case PID_VELOCITY_P_RW:
+        case PID_VELOCITY_I_RW:
+        case PID_VELOCITY_D_RW:
+        case PID_VELOCITY_OUTPUT_RAMP_RW:
+        case PID_VELOCITY_LIMIT_RW:
+        case LPF_VELOCITY_TF_RW:
+        case P_ANGLE_P_RW:
+        case P_ANGLE_LIMIT_RW:
+        case LPF_ANGLE_TF_RW:
+        case MOTION_DOWNSAMPLE_RW:
+        case MOTION_CNT_RW:
+        case SENSOR_OFFSET_RW:
+        case ZERO_ELECTRIC_ANGLE_RW:
+        case SENSOR_DIRECTION_RW:
+        case PP_CHECK_RESULT_RW:
+        {
+            auto reg = active_feedback_register;
+            size_t len =
+                (reg == ENABLED_RW || reg == MODULATION_CENTERED_RW || reg == PP_CHECK_RESULT_RW)
+                    ? sizeof(bool)
+                : (reg == MOTOR_STATUS_R || reg == FOC_MODULATION_RW ||
+                   reg == TORQUE_CONTROLLER_RW || reg == CONTROLLER_RW ||
+                   reg == SENSOR_DIRECTION_RW)
+                    ? sizeof(uint8_t)
+                    : sizeof(float);
+            memcpy(buf, CANFuocoRegisterMapNames.at(reg), len);
+            return len;
+        }
+
+        case SHAFT_FEEDBACK_R:
+            memcpy(buf, &motor.shaft_velocity, sizeof(float));
+            memcpy(buf + sizeof(float), &motor.shaft_angle, sizeof(float));
+            return 2 * sizeof(float);
+
+        default:
+            return 0;
     }
+}
 
-    return true;
+CANFuocoRegisterMap CANFuoco::feedback_register() const
+{
+    return active_feedback_register;
 }
